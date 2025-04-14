@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Về chúng tôi-STUDY4</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                text-align: center; /* Căn giữa toàn bộ nội dung */
+            }
+
+            .content-container {
+                max-width: 800px;
+                margin: 0 auto; /* Căn giữa khối nội dung */
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 32px;
+                font-weight: bold;
+                text-transform: uppercase; /* In đậm và viết hoa "Về chúng tôi" */
+            }
+
+            h2 {
+                font-weight: bold;
+                font-size: 24px; /* In đậm "Thông tin doanh nghiệp" và "Thông tin trung tâm đào tạo" */
+                margin-top: 20px;
+            }
+
+            p {
+                font-size: 18px;
+                margin: 10px 0;
+            }
+
+            .bold-text {
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div th:replace="~{header.html}"></div>
+        <div class="content-container">
+            <h1>Về chúng tôi</h1>
+            <p>
+                Công ty TNHH Công Nghệ A PLUS, đơn vị chủ quản website <a href="https://study4.com" target="_blank">https://study4.com</a>, chuyên phát triển và cung cấp các phần mềm luyện thi IELTS, TOEIC, HSK ... online.
+            </p>
+            <p>
+                Các phần mềm luyện thi IELTS, TOEIC, HSK online chất lượng cao của STUDY4 đều được thiết kế sát format thi thật, theo chương trình chuẩn CEFR (A1-C2) của đại học Cambridge và Oxford (Anh) với nhiều tính năng và hệ thống bài tập phong phú đa dạng.
+            </p>
+            <p>
+                Phần mềm luyện thi bao gồm các tính năng chuyên sâu và lộ trình luyện thi cá nhân hóa để chinh phục các mốc điểm quan trọng. STUDY4 áp dụng những công nghệ tối ưu vào học tập như adaptive learning tối ưu lộ trình luyện thi, spaced-repetition để ôn tập flashcards, các bài tập mini-game, AI để chấm chữa phát âm và bài thi nói/viết. Toàn bộ quá trình luyện thi của bạn sẽ được thống kê chi tiết theo ngày và theo từng dạng câu hỏi để có thể dễ dàng theo dõi tiến độ và điều chỉnh lộ trình ôn tập một cách phù hợp.
+            </p>
+            <h2 class="bold-text">Thông tin doanh nghiệp:</h2>
+            <p>
+                <span class="bold-text">Công ty chủ quản:</span> Công ty TNHH Công Nghệ A Plus <br>
+                <span class="bold-text">Giấy đăng ký kinh doanh:</span> 0109675459 <br>
+                <span class="bold-text">Địa chỉ:</span> Số 15, Ngõ 208, Giải Phóng, Thanh Xuân, Hà Nội
+            </p>
+
+            <h2 class="bold-text">Thông tin trung tâm đào tạo:</h2>
+            <p>
+                <span class="bold-text">Trung tâm ngoại ngữ STUDY4</span><br>
+                Giấy chứng nhận hoạt động đào tạo, bồi dưỡng số 2654/QĐ-SGDĐT do Sở Giáo dục và Đào tạo Hà Nội cấp <br>
+                <span class="bold-text">Địa chỉ:</span> Số 17, Ngõ 208 Giải Phóng, Phường Phương Liệt, Quận Thanh Xuân, Thành phố Hà Nội, Việt Nam
+            </p>
+
+            <p>
+                Xin vui lòng liên hệ với chúng tôi nếu bạn có bất cứ thắc mắc hay góp ý nào.
+            </p>
+        </div>
+        <div th:replace="~{footer.html}"></div>
+    </body>
+</html>

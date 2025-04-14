@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Test</title>
+    <style>
+        /* Phần Pagination */
+        .pagination a.active {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        /* Màu xanh khi di chuột vào số trang */
+        .pagination a:hover {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        /* Cấu hình cho body */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        /* Container chứa nội dung */
+        .content-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: left;
+        }
+
+        /* Tiêu đề chính */
+        h2 {
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        /* Danh sách các bài thi */
+        .test-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 5px;
+        }
+
+        .test-list div {
+            margin: 0 1px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 32%; /* Mỗi bài thi chiếm 32% chiều rộng của container */
+            box-sizing: border-box;
+        }
+
+        /* Hiệu ứng khi di chuột vào các bài thi */
+        .test-list div:hover {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            margin: 0 5px;
+            padding: 10px 15px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{header.html}"></div>
+<div class="content-container">
+    <a href="http://localhost:8080/admin/create-toeic-exam">Create TOEIC Exam</a>
+    <div><strong>Total Exams:</strong> <span th:text="${listToeicExams.totalElements}"></span></div>
+
+    <!-- Hiển thị các bài thi theo từng trang -->
+    <div class="test-list">
+        <div th:each="toeicExam : ${listToeicExams.content}">
+<!--            <a th:href="@{/admin/create-toeic-question/{examId}(examId=${toeicExam.examId})}" method="get">-->
+            <a th:href="@{/admin/show-toeic-question/{examId}(examId=${toeicExam.examId})}">
+                <p><strong>Exam Name:</strong> <span th:text="${toeicExam.examName}"></span></p>
+                <p><strong>Duration:</strong> <span th:text="${toeicExam.duration}"></span> minutes</p>
+                <p><strong>Number of Participants:</strong> <span th:text="${toeicExam.numOfParticipants}"></span></p>
+                <p><strong>Number of Sections:</strong> <span th:text="${toeicExam.numOfSections}"></span></p>
+                <p><strong>Number of Questions:</strong> <span th:text="${toeicExam.numOfQuestions}"></span></p>
+                <p><strong>Description:</strong> <span th:text="${toeicExam.description}"></span></p>
+                <p><strong>Comments:</strong></p>
+                <ul>
+                    <li th:each="comment : ${toeicExam.comments}" th:text="${comment}"></li>
+                </ul>
+            </a>
+        </div>
+    </div>
+
+    <!-- Phân trang -->
+    <div class="pagination" th:if="${listToeicExams.totalElements > 0}">
+        <a th:each="pageNum : ${#numbers.sequence(1, listToeicExams.totalPages)}"
+           th:href="@{/admin/toeic(pageNo=${pageNum})}"
+           th:text="${pageNum}"
+           th:classappend="${pageNum == currentPage} ? 'active' : ''"></a>
+    </div>
+</div>
+<div th:replace="~{footer.html}"></div>
+</body>
+</html>

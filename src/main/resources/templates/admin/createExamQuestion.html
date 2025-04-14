@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Exam Question</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        #thunbnail {
+            display: block;
+            margin-top: 20px;
+            max-width: 300px;
+            max-height: 300px;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Create Exam Question</h1>
+    <form th:action="@{/admin/create-toeic-question/{examId}(examId=${examId})}" method="post" enctype="multipart/form-data">
+        <div>
+            <label for="questionText">Question Text:</label>
+            <textarea id="questionText" name="questionText" required></textarea>
+        </div>
+        <div>
+            <label for="dapAn1">Answer 1:</label>
+            <input type="text" id="dapAn1" name="dapAn1" required/>
+        </div>
+        <div>
+            <label for="dapAn2">Answer 2:</label>
+            <input type="text" id="dapAn2" name="dapAn2" required/>
+        </div>
+        <div>
+            <label for="dapAn3">Answer 3:</label>
+            <input type="text" id="dapAn3" name="dapAn3" required/>
+        </div>
+        <div>
+            <label for="dapAn4">Answer 4:</label>
+            <input type="text" id="dapAn4" name="dapAn4" required/>
+        </div>
+        <div>
+            <label for="correctAnswer">Correct Answer:</label>
+            <select id="correctAnswer" name="correctAnswer" required>
+                <option value="dapAn1">Answer 1</option>
+                <option value="dapAn2">Answer 2</option>
+                <option value="dapAn3">Answer 3</option>
+                <option value="dapAn4">Answer 4</option>
+            </select>
+        </div>
+        <div>
+            <label>Image:</label>
+            <input type="file" id="image" name="images" accept="image/*" />
+        </div>
+        <div>
+            <img id="thunbnail" alt=""/>
+        </div>
+        <div>
+            <label for="part">Part:</label>
+            <input type="number" id="part" name="part" required min="1" max="7"/>
+        </div>
+        <button type="submit">Create Exam Question</button>
+    </form>
+    <script>
+        $(document).ready(function () {
+            $('#image').on('change', function (event) {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#thunbnail').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#thunbnail').attr('src', '');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

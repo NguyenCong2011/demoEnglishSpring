@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Footer</title>
+    <style>
+        /* Style cho footer */
+        .footer {
+            background-color: white; /* Nền trắng cho footer */
+            padding: 40px 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Chia footer thành 4 phần */
+        .footer-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            flex-wrap: wrap; /* Cho phép các phần tử tự động xuống dòng nếu cần */
+            margin-bottom: 10px
+        }
+
+        /* Các phần tử trong footer */
+        .footer-section {
+            flex: 1;
+            padding: 10px;
+            min-width: 250px; /* Đảm bảo mỗi phần có chiều rộng tối thiểu */
+        }
+
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: black; /* Chữ đen cho tiêu đề */
+            font-weight: bold; /* In đậm các mục này */
+        }
+
+        .footer-section ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin: 5px 0;
+        }
+
+        .footer-section ul li a {
+            text-decoration: none;
+            color: #333; /* Chữ đen cho các liên kết */
+        }
+
+        .footer-section ul li a:hover {
+            text-decoration: underline;
+        }
+
+        /* Thông tin doanh nghiệp */
+        .company-info {
+            color: black; /* Chữ đen cho thông tin doanh nghiệp */
+            padding: 20px;
+            margin-top: 10px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .footer-text {
+            text-align: center; /* Căn giữa văn bản */
+            font-size: 14px; /* Thay đổi kích thước font nếu cần */
+            margin: 5px 0; /* Thêm một chút khoảng cách giữa các dòng */
+        }
+
+
+        .company-info h3 {
+            margin-bottom: 10px;
+        }
+
+        .company-info p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="footer">
+    <div class="footer-container">
+        <!-- Phần 1: Trống hoặc thêm nội dung khác nếu cần -->
+        <div class="footer-section"></div>
+
+        <!-- Phần 2: Về STUDY4 -->
+        <div class="footer-section">
+            <h3>Về STUDY4</h3>
+            <ul>
+                <li>Giới thiệu</li>
+                <li>Liên hệ</li>
+                <li>Điều khoản bảo mật</li>
+                <li>Điều khoản sử dụng</li>
+            </ul>
+        </div>
+
+        <!-- Phần 3: Tài nguyên -->
+        <div class="footer-section">
+            <h3>Tài nguyên</h3>
+            <ul>
+                <li><a href="/resources">Tài nguyên</a></li>
+                <li><a href="/test-library">Thư viện đề thi</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="/resources">Tổng hợp tài liệu</a></li>
+            </ul>
+        </div>
+
+        <!-- Phần 4: Chính sách chung -->
+        <div class="footer-section">
+            <h3>Chính sách</h3>
+            <ul>
+                <li><a href="/policy">Chính sách chung</a></li>
+                <li><a href="/guide">Hướng dẫn sử dụng</a></li>
+                <li><a href="/payment-guide">Hướng dẫn thanh toán</a></li>
+                <li><a href="/terms-and-conditions">Điều khoản và Điều Kiện Giao Dịch</a></li>
+                <li><a href="/returns-policy">Chính sách kiểm hàng</a></li>
+                <li><a href="/shipping-policy">Chính sách giao, nhận hàng</a></li>
+                <li><a href="/complaints">Phản hồi, khiếu nại</a></li>
+                <li><a href="/returns-exchanges">Chính sách chuyển đổi, hoàn hủy</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Thông tin doanh nghiệp -->
+    <div class="company-info">
+        <h3>Thông tin doanh nghiệp</h3>
+        <p>CÔNG TY TNHH CÔNG NGHỆ A PLUS</p>
+        <p>Điện thoại liên hệ/Hotline: 096 369 5525</p>
+        <p>Email: <a href="mailto:study4.team@gmail.com">study4.team@gmail.com</a></p>
+        <p>Địa chỉ trụ sở: Số 15, Ngõ 208 Giải Phóng, Phường Phương Liệt, Quận Thanh Xuân, Thành phố Hà Nội, Việt Nam</p>
+        <p>Giấy chứng nhận Đăng ký doanh nghiệp số: 0109675459 do Sở Kế hoạch và Đầu tư thành phố Hà Nội cấp</p>
+        <p>Ngày cấp phép: 17/06/2021</p>
+        <p>CS1: TRUNG TÂM NGOẠI NGỮ STUDY4 - Số 17, Ngõ 208 Giải Phóng, Phường Phương Liệt, Quận Thanh Xuân, Thành phố Hà Nội, Việt Nam-Quyết định cho phép Trung tâm ngoại ngữ hoạt động số 2654/QĐ-SGDĐT Hà Nội</p>
+
+        <p class="footer-text">
+            STUDY4.COM © Bản quyền của Công ty TNHH Công Nghệ A Plus.<br>
+            IELTS is a registered trademark of University of Cambridge, the British Council, and IDP Education Australia. This site and its owners are not affiliated, approved or endorsed by the<br>
+            University of Cambridge ESOL, the British Council, and IDP Education Australia.<br>
+            ETS®, TOEIC® and TOEFL® are registered trademarks of Educational Testing Service (ETS). This web site is not endorsed or approved by ETS.
+        </p>
+    </div>
+</div>
+</body>
+</html>

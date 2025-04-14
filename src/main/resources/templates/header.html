@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Header</title>
+  <style>
+    /* Style cho header */
+    .header-container {
+        display: flex; /* Dùng Flexbox để bố trí các phần tử ngang */
+        justify-content: flex-end; /* Căn tất cả các liên kết về bên phải */
+        align-items: center; /* Căn chỉnh các phần tử theo chiều dọc */
+        padding: 10px;
+    }
+
+    /* Style cho các liên kết trong header */
+    .header-container a {
+        color: black;
+        text-decoration: none;
+        margin: 0 5px; /* Khoảng cách giữa các liên kết */
+        font-size: 18px;
+    }
+
+    .header-container a:hover {
+        text-decoration: underline;
+    }
+
+    /* Ô màu xanh cho "Đăng Nhập" */
+    .login-container {
+        background-color: #007BFF; /* Màu xanh */
+        padding: 5px 10px;
+        margin-left: 10px; /* Khoảng cách giữa "Đăng Nhập" và các liên kết khác */
+        border-radius: 20px;
+    }
+
+    .login-container a {
+        color: white;
+        font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+<div class="header-container">
+  <a href="/about">Giới thiệu</a>
+  <a href="/program">Chương trình học</a>
+  <a href="/online-tests">Đề thi online</a>
+  <a href="/flashcards">Flashcards</a>
+  <a href="/blog">Blog</a>
+  <a href="/activate-account">Kích hoạt tài khoản</a>
+
+  <div class="login-container">
+    <a href="/login">Đăng Nhập</a>
+  </div>
+  <div class="register-container">
+    <a href="/user/create">Đăng Ký</a>
+  </div>
+</div>
+</body>
+</html>

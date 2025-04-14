@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My English Website</title>
+</head>
+<body>
+    <div th:replace="~{header.html}"></div>
+    <p th:text="'Hello, ' + ${name} + '! Welcome to my website.'"></p>
+    <div th:replace="~{footer.html}"></div>
+</body>
+</html>

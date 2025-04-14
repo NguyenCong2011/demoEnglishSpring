@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEIC Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: left;
+        }
+
+        h2 {
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .question-list {
+            margin-top: 20px;
+        }
+
+        .question-item {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .question-item p {
+            margin: 5px 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .part-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Các phần link mặc định */
+        .part-links a {
+            text-decoration: none;
+            padding: 10px;
+            background-color: #f1f1f1; /* Màu nền mặc định */
+            color: black;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s; /* Hiệu ứng chuyển màu mượt */
+        }
+
+        /* Màu nền khi di chuột vào các liên kết */
+        .part-links a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Màu nền khi phần được chọn */
+        .part-links a.active {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+
+    <!-- Thêm thư viện jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div th:replace="~{header.html}"></div>
+
+<div class="content-container">
+    <!-- Hiển thị các liên kết cho từng phần -->
+    <div class="part-links">
+        <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=1)}"
+           th:classappend="${part == 1} ? 'active' : ''"
+           id="part1">Part 1</a>
+        <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=2)}"
+           th:classappend="${part == 2} ? 'active' : ''"
+           id="part2">Part 2</a>
+        <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=3)}"
+           th:classappend="${part == 3} ? 'active' : ''"
+           id="part3">Part 3</a>
+        <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=4)}"
+           th:classappend="${part == 4} ? 'active' : ''"
+           id="part4">Part 4</a>
+        <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=5)}"
+           th:classappend="${part == 5} ? 'active' : ''"
+           id="part5">Part 5</a>
+        <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=6)}"
+           th:classappend="${part == 6} ? 'active' : ''"
+           id="part6">Part 6</a>
+        <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=7)}"
+           th:classappend="${part == 7} ? 'active' : ''"
+           id="part7">Part 7</a>
+    </div>
+
+    <h2>Questions for Part: <span th:text="${part}"></span></h2>
+    <p><a th:href="@{/admin/create-toeic-question/{examId}(examId=${examId})}">Create Question</a></p>
+    <p>
+        <form th:action="@{/admin/import-toeic-questions/{examId}(examId=${examId})}" method="post" enctype="multipart/form-data">
+            <label for="file">Import Excel Questions:</label>
+            <input type="file" id="file" name="file" accept=".xlsx, .xls" required />
+            <button type="submit">Upload</button>
+        </form>
+    </p>
+
+
+
+    <div class="question-list">
+        <div th:each="toeicQuestion : ${toeicQuestions}">
+            <div class="question-item">
+                <p><strong>Question:</strong> <span th:text="${toeicQuestion.questionText}"></span></p>
+                <p><strong>Answer 1:</strong> <span th:text="${toeicQuestion.dapAn1}"></span></p>
+                <p><strong>Answer 2:</strong> <span th:text="${toeicQuestion.dapAn2}"></span></p>
+                <p><strong>Answer 3:</strong> <span th:text="${toeicQuestion.dapAn3}"></span></p>
+                <p><strong>Answer 4:</strong> <span th:text="${toeicQuestion.dapAn4}"></span></p>
+                <p><strong>Correct Answer:</strong> <span th:text="${toeicQuestion.correctAnswer}"></span></p>
+                <img th:src="@{${toeicQuestion.image}}" alt="Image" style="max-width: 300px;" />
+            </div>
+    </div>
+</div>
+
+<div th:replace="~{footer.html}"></div>
+
+<script>
+    $(document).ready(function() {
+    });
+</script>
+</div>
+</body>
+</html>
