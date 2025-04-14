@@ -48,11 +48,14 @@ public class ToeicQuestionService {
         List<ToeicQuestionResponse> responses = new ArrayList<>();
 
         for (ToeicQuestionCreateRequest toeicQuestionCreateRequest : toeicQuestionCreateRequests) {
-            if (toeicQuestionRepository.existsByQuestionText(toeicQuestionCreateRequest.getQuestionText()) &&
-                    toeicQuestionRepository.existsByCorrectAnswer(toeicQuestionCreateRequest.getCorrectAnswer())) {
+            if (toeicQuestionRepository.existsByQuestionTextAndCorrectAnswerAndToeicExam_ExamId(
+                    toeicQuestionCreateRequest.getQuestionText(),
+                    toeicQuestionCreateRequest.getCorrectAnswer(),
+                    examId)) {
                 throw new AppException(ErrorCode.TOEIC_QUESTION_EXITSTED);
             }
         }
+
 
         // Tạo câu hỏi và lưu ảnh
         for (int i = 0; i < toeicQuestionCreateRequests.size(); i++) {
@@ -122,17 +125,26 @@ public class ToeicQuestionService {
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) continue; // Skip header
 
+                String questionText = getCellValue(row.getCell(0));
+                String correctAnswer = getCellValue(row.getCell(5));
+
+                boolean isExist = toeicQuestionRepository
+                        .existsByQuestionTextAndCorrectAnswerAndToeicExam_ExamId(questionText, correctAnswer, examId);
+
+                if (isExist) {
+                    throw new AppException(ErrorCode.TOEIC_QUESTION_EXITSTED);
+                }
+
                 ToeicQuestionCreateRequest request = ToeicQuestionCreateRequest.builder()
-                        .questionText(getCellValue(row.getCell(0)))
+                        .questionText(questionText)
                         .dapAn1(getCellValue(row.getCell(1)))
                         .dapAn2(getCellValue(row.getCell(2)))
                         .dapAn3(getCellValue(row.getCell(3)))
                         .dapAn4(getCellValue(row.getCell(4)))
-                        .correctAnswer(getCellValue(row.getCell(5)))
+                        .correctAnswer(correctAnswer)
                         .part((int) row.getCell(6).getNumericCellValue())
                         .build();
 
-                // Mapping + save
                 ToeicQuestion question = toeicQuestionMapper.toToeicQuestion(request);
                 question.setToeicExam(toeicExam);
                 toeicQuestionRepository.save(question);
@@ -146,6 +158,7 @@ public class ToeicQuestionService {
 
         return responses;
     }
+
 
 //    public List<ToeicQuestionResponse> importToeicQuestionsFromExcel(MultipartFile file, Long examId) {
 //        List<ToeicQuestionResponse> responses = new ArrayList<>();

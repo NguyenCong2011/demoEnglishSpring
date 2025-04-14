@@ -52,74 +52,81 @@
             margin-bottom: 20px;
         }
 
-        /* Các phần link mặc định */
         .part-links a {
             text-decoration: none;
             padding: 10px;
-            background-color: #f1f1f1; /* Màu nền mặc định */
+            background-color: #f1f1f1;
             color: black;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s; /* Hiệu ứng chuyển màu mượt */
+            transition: background-color 0.3s;
         }
 
-        /* Màu nền khi di chuột vào các liên kết */
         .part-links a:hover {
             background-color: #007bff;
             color: white;
         }
 
-        /* Màu nền khi phần được chọn */
         .part-links a.active {
             background-color: #007bff;
             color: white;
         }
+
+        /* Thông báo lỗi */
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background-color: #ffe6e6;
+            border: 1px solid red;
+            padding: 10px;
+            border-radius: 5px;
+        }
     </style>
 
-    <!-- Thêm thư viện jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <div th:replace="~{header.html}"></div>
 
 <div class="content-container">
-    <!-- Hiển thị các liên kết cho từng phần -->
+
+    <!-- ✅ Thông báo lỗi khi import -->
+    <div th:if="${error}" class="error-message">
+        <p th:text="${error}"></p>
+    </div>
+
+    <!-- Các liên kết Part -->
     <div class="part-links">
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=1)}"
-           th:classappend="${part == 1} ? 'active' : ''"
-           id="part1">Part 1</a>
+           th:classappend="${part == 1} ? 'active' : ''" id="part1">Part 1</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=2)}"
-           th:classappend="${part == 2} ? 'active' : ''"
-           id="part2">Part 2</a>
+           th:classappend="${part == 2} ? 'active' : ''" id="part2">Part 2</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=3)}"
-           th:classappend="${part == 3} ? 'active' : ''"
-           id="part3">Part 3</a>
+           th:classappend="${part == 3} ? 'active' : ''" id="part3">Part 3</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=4)}"
-           th:classappend="${part == 4} ? 'active' : ''"
-           id="part4">Part 4</a>
+           th:classappend="${part == 4} ? 'active' : ''" id="part4">Part 4</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=5)}"
-           th:classappend="${part == 5} ? 'active' : ''"
-           id="part5">Part 5</a>
+           th:classappend="${part == 5} ? 'active' : ''" id="part5">Part 5</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=6)}"
-           th:classappend="${part == 6} ? 'active' : ''"
-           id="part6">Part 6</a>
+           th:classappend="${part == 6} ? 'active' : ''" id="part6">Part 6</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=7)}"
-           th:classappend="${part == 7} ? 'active' : ''"
-           id="part7">Part 7</a>
+           th:classappend="${part == 7} ? 'active' : ''" id="part7">Part 7</a>
     </div>
 
     <h2>Questions for Part: <span th:text="${part}"></span></h2>
     <p><a th:href="@{/admin/create-toeic-question/{examId}(examId=${examId})}">Create Question</a></p>
+
+    <!-- Form import Excel -->
     <p>
-        <form th:action="@{/admin/import-toeic-questions/{examId}(examId=${examId})}" method="post" enctype="multipart/form-data">
-            <label for="file">Import Excel Questions:</label>
-            <input type="file" id="file" name="file" accept=".xlsx, .xls" required />
-            <button type="submit">Upload</button>
-        </form>
+    <form th:action="@{/admin/import-toeic-questions/{examId}(examId=${examId})}" method="post" enctype="multipart/form-data">
+        <label for="file">Import Excel Questions:</label>
+        <input type="file" id="file" name="file" accept=".xlsx, .xls" required />
+        <button type="submit">Upload</button>
+    </form>
     </p>
 
-
-
+    <!-- Danh sách câu hỏi -->
     <div class="question-list">
         <div th:each="toeicQuestion : ${toeicQuestions}">
             <div class="question-item">
@@ -131,6 +138,7 @@
                 <p><strong>Correct Answer:</strong> <span th:text="${toeicQuestion.correctAnswer}"></span></p>
                 <img th:src="@{${toeicQuestion.image}}" alt="Image" style="max-width: 300px;" />
             </div>
+        </div>
     </div>
 </div>
 
@@ -138,8 +146,13 @@
 
 <script>
     $(document).ready(function() {
+        // Có thể scroll tới lỗi nếu muốn
+        if ($(".error-message").length) {
+            $('html, body').animate({
+                scrollTop: $(".error-message").offset().top - 50
+            }, 600);
+        }
     });
 </script>
-</div>
 </body>
 </html>

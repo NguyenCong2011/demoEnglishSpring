@@ -13,7 +13,7 @@
       text-align: center;
     }
 
-    .content-container {
+    .content-container1 {
       max-width: 900px;
       margin:0;
       padding: 20px;
@@ -63,7 +63,7 @@
       background-color: #0056b3;
     }
 
-    .test-list {
+    .test {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
@@ -78,9 +78,9 @@
 </head>
 <body>
 <div th:replace="~{header.html}"></div>
-<div class="content-container">
+<div class="content-container1">
   <h2>Thư viện đề thi</h2>
-  <div class="test-list">
+  <div class="test">
     <a href="/online-tests"><div>Tất cả</div></a>
     <a href="/ielts-academic"><div>IELTS Academic</div></a>
     <a href="/ielts-general"><div>IELTS General</div></a>
@@ -92,7 +92,7 @@
     <a href="/hsk-5"><div>HSK 5</div></a>
   </div>
 
-  <div class="test-list">
+  <div class="test">
     <a href="/hsk-6"><div>HSK 6</div></a>
     <a href="/topik-i"><div>TOPIK I</div></a>
     <a href="/topik-ii"><div>TOPIK II</div></a>
@@ -101,7 +101,7 @@
     <a href="/sinh-hoc-thptqg"><div>Sinh học THPTQG</div></a>
   </div>
 
-  <div class="test-list">
+  <div class="test">
     <a href="/hoa-hoc-thptqg"><div>Hóa học THPTQG</div></a>
     <a href="/vat-ly-thptqg"><div>Vật lý THPTQG</div></a>
     <a href="/new-sat"><div>NEW SAT</div></a>

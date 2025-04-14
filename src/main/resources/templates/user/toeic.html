@@ -1,115 +1,211 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOEIC Test</title>
-    <style>
-        /* Phần Pagination */
-        .pagination a.active {
-            background-color: #007BFF;
-            color: white;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEIC Test</title>
+  <style>
+    /* Phần Pagination */
+    .pagination a.active {
+        background-color: #007BFF;
+        color: white;
+    }
 
-        /* Màu xanh khi di chuột vào số trang */
-        .pagination a:hover {
-            background-color: #007BFF;
-            color: white;
-        }
+    /* Màu xanh khi di chuột vào số trang */
+    .pagination a:hover {
+        background-color: #007BFF;
+        color: white;
+    }
 
-        /* Cấu hình cho body */
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
+    /* Cấu hình cho body */
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
 
-        /* Container chứa nội dung */
-        .content-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: left;
-        }
+    /* Container chứa nội dung */
+    .content-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: left;
+    }
 
-        /* Tiêu đề chính */
-        h2 {
-            font-weight: bold;
-            font-size: 24px;
-        }
+    /* Danh sách các bài thi */
+    .test-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 5px;
+    }
 
-        /* Danh sách các bài thi */
-        .test-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            gap: 5px;
-        }
+    .test-list div {
+        margin: 0 1px;
+        padding: 10px;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 32%; /* Mỗi bài thi chiếm 32% chiều rộng của container */
+        box-sizing: border-box;
+    }
 
-        .test-list div {
-            margin: 0 1px;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 32%; /* Mỗi bài thi chiếm 32% chiều rộng của container */
-            box-sizing: border-box;
-        }
+    /* Hiệu ứng khi di chuột vào các bài thi */
+    .test-list div:hover {
+        background-color: #007BFF;
+        color: white;
+    }
 
-        /* Hiệu ứng khi di chuột vào các bài thi */
-        .test-list div:hover {
-            background-color: #007BFF;
-            color: white;
-        }
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
 
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
+    .pagination a {
+        margin: 0 5px;
+        padding: 10px 15px;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        text-decoration: none;
+        color: black;
+    }
+    .content-container1 {
+        max-width: 900px;
+        margin:0;
+        padding: 20px;
+        text-align: left;
+    }
 
-        .pagination a {
-            margin: 0 5px;
-            padding: 10px 15px;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-            text-decoration: none;
-            color: black;
-        }
-    </style>
+    h2 {
+    font-weight: bold;
+    font-size: 24px;
+    text-align: left;
+    }
+
+    p {
+    font-size: 18px;
+    margin: 10px 0;
+    }
+
+    .search-container {
+    margin-top: 20px;
+    text-align: left;
+    }
+
+    .search-container input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    }
+
+    .search-container input[type="text"]::placeholder {
+    color: #bbb;
+    }
+
+    .search-container button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    }
+
+    .search-container button:hover {
+    background-color: #0056b3;
+    }
+
+    .test {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    }
+
+    .sub-list {
+    margin-top: 20px;
+    margin-left:1px;
+    }
+  </style>
 </head>
 <body>
 <div th:replace="~{header.html}"></div>
-<div class="content-container">
-    <div>TOEIC Test</div>
-    <div><strong>Total Exams:</strong> <span th:text="${listToeicExams.totalElements}"></span></div>
-    
-    <!-- Hiển thị các bài thi theo từng trang -->
-    <div class="test-list">
-        <div th:each="toeicExam : ${listToeicExams.content}">
-                <p><strong>Exam Name:</strong> <span th:text="${toeicExam.examName}"></span></p>
-                <p><strong>Duration:</strong> <span th:text="${toeicExam.duration}"></span> minutes</p>
-                <p><strong>Number of Participants:</strong> <span th:text="${toeicExam.numOfParticipants}"></span></p>
-                <p><strong>Number of Sections:</strong> <span th:text="${toeicExam.numOfSections}"></span></p>
-                <p><strong>Number of Questions:</strong> <span th:text="${toeicExam.numOfQuestions}"></span></p>
-                <p><strong>Description:</strong> <span th:text="${toeicExam.description}"></span></p>
-                <p><strong>Comments:</strong></p>
-                <ul>
-                    <li th:each="comment : ${toeicExam.comments}" th:text="${comment}"></li>
-                </ul>
-        </div>
-    </div>
+<div class="content-container1">
+  <h2>Thư viện đề thi</h2>
+  <div class="test">
+    <a href="/online-tests"><div>Tất cả</div></a>
+    <a href="/ielts-academic"><div>IELTS Academic</div></a>
+    <a href="/ielts-general"><div>IELTS General</div></a>
+    <a href="/admin/toeic"><div>TOEIC</div></a>
+    <a href="/hsk-1"><div>HSK 1</div></a>
+    <a href="/hsk-2"><div>HSK 2</div></a>
+    <a href="/hsk-3"><div>HSK 3</div></a>
+    <a href="/hsk-4"><div>HSK 4</div></a>
+    <a href="/hsk-5"><div>HSK 5</div></a>
+  </div>
 
-    <!-- Phân trang -->
-    <div class="pagination" th:if="${listToeicExams.totalElements > 0}">
-        <a th:each="pageNum : ${#numbers.sequence(1, listToeicExams.totalPages)}"
-           th:href="@{/admin/toeic(pageNo=${pageNum})}"
-           th:text="${pageNum}"
-           th:classappend="${pageNum == currentPage} ? 'active' : ''"></a>
+  <div class="test">
+    <a href="/hsk-6"><div>HSK 6</div></a>
+    <a href="/topik-i"><div>TOPIK I</div></a>
+    <a href="/topik-ii"><div>TOPIK II</div></a>
+    <a href="/toan-thptqg"><div>Toán THPTQG</div></a>
+    <a href="/tieng-anh-thptqg"><div>Tiếng Anh THPTQG</div></a>
+    <a href="/sinh-hoc-thptqg"><div>Sinh học THPTQG</div></a>
+  </div>
+
+  <div class="test">
+    <a href="/hoa-hoc-thptqg"><div>Hóa học THPTQG</div></a>
+    <a href="/vat-ly-thptqg"><div>Vật lý THPTQG</div></a>
+    <a href="/new-sat"><div>NEW SAT</div></a>
+    <a href="/act"><div>ACT</div></a>
+  </div>
+
+  <!-- Lùi 1 chút và thêm ô tìm kiếm -->
+  <div class="sub-list">
+    <input type="text" id="search" placeholder="Nhập từ khoá bạn muốn tìm kiếm: tên sách, dạng câu hỏi ...">
+    <button onclick="searchTest()">Tìm kiếm</button>
+  </div>
+
+  <!-- Kết quả tìm kiếm -->
+  <div id="search-results"></div>
+</div>
+<div class="content-container">
+  <a href="http://localhost:8080/admin/create-toeic-exam">Create TOEIC Exam</a>
+  <div><strong>Total Exams:</strong> <span th:text="${listToeicExams.totalElements}"></span></div>
+
+  <!-- Hiển thị các bài thi theo từng trang -->
+  <div class="test-list">
+    <div th:each="toeicExam : ${listToeicExams.content}">
+      <!--            <a th:href="@{/admin/create-toeic-question/{examId}(examId=${toeicExam.examId})}" method="get">-->
+      <a th:href="@{/admin/show-toeic-question/{examId}(examId=${toeicExam.examId})}">
+        <p><strong>Exam Name:</strong> <span th:text="${toeicExam.examName}"></span></p>
+        <p><strong>Duration:</strong> <span th:text="${toeicExam.duration}"></span> minutes</p>
+        <p><strong>Number of Participants:</strong> <span th:text="${toeicExam.numOfParticipants}"></span></p>
+        <p><strong>Number of Sections:</strong> <span th:text="${toeicExam.numOfSections}"></span></p>
+        <p><strong>Number of Questions:</strong> <span th:text="${toeicExam.numOfQuestions}"></span></p>
+        <p><strong>Description:</strong> <span th:text="${toeicExam.description}"></span></p>
+        <p><strong>Comments:</strong></p>
+        <ul>
+          <li th:each="comment : ${toeicExam.comments}" th:text="${comment}"></li>
+        </ul>
+      </a>
     </div>
+  </div>
+
+  <!-- Phân trang -->
+  <div class="pagination" th:if="${listToeicExams.totalElements > 0}">
+    <a th:each="pageNum : ${#numbers.sequence(1, listToeicExams.totalPages)}"
+       th:href="@{/admin/toeic(pageNo=${pageNum})}"
+       th:text="${pageNum}"
+       th:classappend="${pageNum == currentPage} ? 'active' : ''"></a>
+  </div>
 </div>
 <div th:replace="~{footer.html}"></div>
 </body>

@@ -128,9 +128,17 @@ public class AdminController {
 
     @PostMapping("/import-toeic-questions/{examId}")
     public String importToeicQuestions(@PathVariable Long examId,
-                                       @RequestParam("file") MultipartFile file) {
-        toeicQuestionService.importToeicQuestionsFromExcel(file, examId);
-        return "redirect:/admin/toeic"; // Trả về danh sách đề thi
+                                       @RequestParam("file") MultipartFile file,
+                                       Model model) {
+        try {
+            toeicQuestionService.importToeicQuestionsFromExcel(file, examId);
+            return "redirect:/admin/toeic";
+        } catch (AppException e) {
+            model.addAttribute("error", "Import thất bại: " + e.getMessage());
+            model.addAttribute("examId", examId);
+            return "admin/showExamQuestionByPart"; // hoặc trang hiển thị danh sách câu hỏi
+        }
     }
+
 
 }
