@@ -1,7 +1,9 @@
 package com.example.english.demo.controller;
 
+import com.example.english.demo.dto.request.ApiResponse;
 import com.example.english.demo.dto.request.ToeicExamCreateRequest;
 import com.example.english.demo.dto.request.ToeicQuestionCreateRequest;
+import com.example.english.demo.dto.response.ToeicExamResponse;
 import com.example.english.demo.dto.response.ToeicQuestionResponse;
 import com.example.english.demo.entity.ToeicExam;
 import com.example.english.demo.exception.AppException;
@@ -9,30 +11,14 @@ import com.example.english.demo.exception.ErrorCode;
 import com.example.english.demo.repository.ToeicExamRepository;
 import com.example.english.demo.service.ToeicExamService;
 import com.example.english.demo.service.ToeicQuestionService;
+import com.example.english.demo.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import com.example.english.demo.dto.request.ApiResponse;
-import com.example.english.demo.dto.response.ToeicExamResponse;
-import com.example.english.demo.dto.response.UserResponse;
-import com.example.english.demo.dto.request.UserCreateRequest;
-import com.example.english.demo.service.UserService;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 
 import java.util.ArrayList;
 import java.util.List;

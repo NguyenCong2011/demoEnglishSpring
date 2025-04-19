@@ -12,6 +12,7 @@ import com.example.english.demo.repository.RoleRepository;
 import com.example.english.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 //annotation này của lombook nhá
 @RequiredArgsConstructor
@@ -28,27 +28,29 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserService {
 
+    private final AuthenticationService authenticationService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final EmailSenderService emailSenderService;
 
     //  trước là public User nhưng mà chúng ta không trả về tất cả các dữ liệu của User nên phải tạo UserResponse
-    public UserResponse createUser(UserCreateRequest request){
-        //
-        if(userRepository.existsByUsername(request.getUsername())){
-            throw new AppException(ErrorCode.USER_EXITSTED);
-        }
-        //
-        User user=userMapper.toUser(request);
-        //
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        //
-        HashSet<String> roles=new HashSet<>();
-        roles.add(Roles.USER.name());
-
-        return userMapper.toUserResponse(userRepository.save(user));
-    }
+//    public UserResponse createUser(UserCreateRequest request){
+//        //
+//        if(userRepository.existsByUsername(request.getUsername())){
+//            throw new AppException(ErrorCode.USER_EXITSTED);
+//        }
+//        //
+//        User user=userMapper.toUser(request);
+//        //
+//        user.setPassword(passwordEncoder.encode(request.getPassword()));
+//        //
+//        HashSet<String> roles=new HashSet<>();
+//        roles.add(Roles.USER.name());
+//
+//        return userMapper.toUserResponse(userRepository.save(user));
+//    }
 
     @PostAuthorize("returnObject.owner == authentication.name")//dòng log bên dưới vẫn được in ra kể cả k phải admin,tức là ngược với preauthorize
     public UserResponse getUserById(String id){
@@ -88,6 +90,47 @@ public class UserService {
         String name=context.getAuthentication().getName();
         User user=userRepository.findByUsername(name).orElseThrow(()->new AppException(ErrorCode.USER_EXITSTED));
 
+        return userMapper.toUserResponse(user);
+    }
+
+//    private final JavaMailSender mailSender;
+//
+//    public void sendConfirmationEmail(String email) {
+//        String token = UUID.randomUUID().toString();
+//        String confirmationLink = "http://localhost:8080/user/confirm?token=" + token;
+//
+//        SimpleMailMessage message = new SimpleMailMessage();
+//        message.setTo(email);
+//        message.setSubject("Xác nhận đăng ký");
+//        message.setText("Nhấn vào link để xác nhận: " + confirmationLink);
+//
+//        mailSender.send(message);
+//    }
+
+    public UserResponse createUser(UserCreateRequest request){
+        //
+        if(userRepository.existsByUsername(request.getUsername())){
+            throw new AppException(ErrorCode.USER_EXITSTED);
+        }
+        //
+        User user=userMapper.toUser(request);
+        //
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        //
+        HashSet<String> roles=new HashSet<>();
+        roles.add(Roles.USER.name());
+        user.setActive(false);
+        user = userRepository.save(user);
+
+        // ✅ Generate JWT token để xác nhận email
+        String confirmationToken = authenticationService.generateConfirmationToken(user);
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(request.getEmail());
+        mailMessage.setSubject("Xác nhận đăng ký");
+        mailMessage.setText("Nhấn vào link để xác nhận: "
+                +"http://localhost:8080/user/confirm-account?token=" + confirmationToken);
+        emailSenderService.sendMail(mailMessage);
         return userMapper.toUserResponse(user);
     }
 }

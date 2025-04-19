@@ -53,6 +53,7 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         var user = userRepository.findByUsername(request.getUsername())
+                .filter(User::isActive)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
@@ -194,5 +195,30 @@ public class AuthenticationService {
                 .authenticated(true)
                 .build();
     }
+
+    //hàm này để xác thực token gửi về email
+    public String generateConfirmationToken(User user) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(user.getEmail()) // email sẽ là chủ thể của token
+                .issuer("english-app")
+                .issueTime(new Date())
+                .expirationTime(new Date(Instant.now().plus(15, ChronoUnit.MINUTES).toEpochMilli())) // token xác nhận email chỉ sống 15 phút
+                .jwtID(UUID.randomUUID().toString())
+                .claim("type", "EMAIL_CONFIRM")
+                .build();
+
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(header, payload);
+
+        try {
+            jwsObject.sign(new MACSigner(Signer_Key.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException("Unable to sign confirmation token", e);
+        }
+    }
+
 
 }

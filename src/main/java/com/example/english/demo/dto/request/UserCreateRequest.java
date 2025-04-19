@@ -21,9 +21,6 @@ public class UserCreateRequest {
     @Size(min=4,message = "INVALID_PASWORD")
     private String password;
 
-    private String firstName;
-    private String lastName;
-
     @DobConstraint(min=16,message = "INVALID_DOB")
     private LocalDate dob;
 

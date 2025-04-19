@@ -7,7 +7,7 @@
 </head>
 <body>
 <h2>Login</h2>
-<form th:action="@{/}" method="post">
+<form th:action="@{/login}" method="post">
     <div>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
@@ -20,6 +20,6 @@
 </form>
 
 <!-- Hiển thị thông báo lỗi nếu đăng nhập thất bại -->
-<p th:if="${error}" style="color: red;">${error}</p>
+<p th:if="${error}" th:text="${error}" style="color: red;"></p>
 </body>
 </html>

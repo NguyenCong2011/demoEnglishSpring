@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification account</title>
+</head>
+<body class="text-center">
+    <section layout:fragment="content">
+        <div class="alert alert-success m-5"
+             th:text="|A verification email has been sent to ${emailId}|"></div>
+    </section>
+</body>
+</html>

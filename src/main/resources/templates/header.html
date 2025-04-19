@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
   <meta charset="UTF-8">
   <title>Header</title>
@@ -47,11 +49,23 @@
   <a href="/blog">Blog</a>
   <a href="/activate-account">Kích hoạt tài khoản</a>
 
-  <div class="login-container">
-    <a href="/login">Đăng Nhập</a>
+  <!-- Hiển thị trạng thái người dùng -->
+  <div>
+    <p sec:authorize="isAuthenticated()">✅ User đã đăng nhập</p>
+    <p sec:authorize="!isAuthenticated()">❌ User chưa đăng nhập</p>
   </div>
-  <div class="register-container">
-    <a href="/user/create">Đăng Ký</a>
+
+  <div sec:authorize="isAuthenticated()">
+    ✅ Xin chào <span th:text="${#authentication.name}"></span>
+    <a href="/auth/logout">Đăng xuất</a>
+  </div>
+
+  <div sec:authorize="!isAuthenticated()">
+    <a class="login-container" th:href="@{/login}">Đăng nhập</a>
+  </div>
+
+  <div sec:authorize="!isAuthenticated()">
+    <a class="login-container" th:href="@{/user/create}">Đăng Ký</a>
   </div>
 </div>
 </body>
