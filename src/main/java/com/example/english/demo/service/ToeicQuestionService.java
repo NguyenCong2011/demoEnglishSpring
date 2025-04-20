@@ -56,7 +56,6 @@ public class ToeicQuestionService {
             }
         }
 
-
         // Tạo câu hỏi và lưu ảnh
         for (int i = 0; i < toeicQuestionCreateRequests.size(); i++) {
             ToeicQuestionCreateRequest toeicQuestionCreateRequest = toeicQuestionCreateRequests.get(i);

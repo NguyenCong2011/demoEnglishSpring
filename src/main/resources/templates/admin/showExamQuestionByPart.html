@@ -126,6 +126,14 @@
     </form>
     </p>
 
+    <audio controls>
+        <source th:src="@{'/audio/' + ${toeicExam.audio}}">
+    </audio>
+
+    <p>
+        Đường dẫn: <span th:text="'/audio/' + ${toeicExam.audio}"></span>
+    </p>
+
     <!-- Danh sách câu hỏi -->
     <div class="question-list">
         <div th:each="toeicQuestion : ${toeicQuestions}">

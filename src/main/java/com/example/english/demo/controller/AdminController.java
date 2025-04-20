@@ -97,19 +97,40 @@ public class AdminController {
         }
     }
 
+//    @GetMapping("/show-toeic-question/{examId}")
+//    public String showQuestionsByExamIdAndPart(
+//            @PathVariable Long examId,
+//            @RequestParam(defaultValue = "1") Integer part,
+//            Model model) {
+//
+//        List<ToeicQuestionResponse> toeicQuestionResponses = toeicQuestionService.getToeicQuestionsByPart(examId, part);
+//
+//        model.addAttribute("toeicQuestions", toeicQuestionResponses);
+//        model.addAttribute("examId", examId);
+//        model.addAttribute("part", part);
+//        return "admin/showExamQuestionByPart";
+//    }
+
     @GetMapping("/show-toeic-question/{examId}")
     public String showQuestionsByExamIdAndPart(
             @PathVariable Long examId,
             @RequestParam(defaultValue = "1") Integer part,
             Model model) {
 
+        // ✅ Lấy thông tin đề thi
+        ToeicExam toeicExam = toeicExamRepository.findById(examId)
+                .orElseThrow(() -> new AppException(ErrorCode.TOEIC_EXAM_NOT_EXITSTED));
+
         List<ToeicQuestionResponse> toeicQuestionResponses = toeicQuestionService.getToeicQuestionsByPart(examId, part);
 
+        // ✅ Truyền thêm vào model
+        model.addAttribute("toeicExam", toeicExam);
         model.addAttribute("toeicQuestions", toeicQuestionResponses);
         model.addAttribute("examId", examId);
         model.addAttribute("part", part);
         return "admin/showExamQuestionByPart";
     }
+
 
 
     @PostMapping("/import-toeic-questions/{examId}")

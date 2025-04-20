@@ -1,21 +1,17 @@
 package com.example.english.demo.controller;
 
-import com.example.english.demo.dto.request.ApiResponse;
 import com.example.english.demo.dto.request.AuthenticationRequest;
-import com.example.english.demo.dto.request.LogoutRequest;
-import com.example.english.demo.dto.response.AuthenticationResponse;
 import com.example.english.demo.service.AuthenticationService;
-import com.nimbusds.jose.JOSEException;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.text.ParseException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @RequiredArgsConstructor
 @Controller
@@ -33,25 +29,6 @@ public class HomeController {
         return "login";
     }
 
-//    @PostMapping("/login")
-//    public String authenticate(@ModelAttribute @Valid AuthenticationRequest request, Model model) {
-//        ApiResponse<AuthenticationResponse> apiResponse = new ApiResponse<>();
-//
-//        try {
-//            var result = authenticationService.authenticate(request);
-//
-//            if (result.isAuthenticated()) {
-//                apiResponse.setResult(result);
-//                return "redirect:/";
-//            } else {
-//                model.addAttribute("error", "Authentication failed");
-//                return "login";
-//            }
-//        } catch (Exception e) {
-//            model.addAttribute("error", "Invalid username or password!");
-//            return "login";
-//        }
-//    }
 
     @PostMapping("/login")
     public String authenticate(@ModelAttribute @Valid AuthenticationRequest request,
