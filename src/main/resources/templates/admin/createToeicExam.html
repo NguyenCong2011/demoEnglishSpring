@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create TOEIC Exam</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .comment-item {
             display: flex;
@@ -33,26 +34,17 @@
                     <h2 class="mb-0">Create New TOEIC Exam</h2>
                 </div>
                 <div class="card-body">
-                    <!-- Success message -->
-                    <div th:if="${apiResponse != null}" class="alert alert-success" role="alert">
-                        <h4 class="alert-heading">Exam Created Successfully!</h4>
-                        <p>Exam Name: <span th:text="${apiResponse.result.examName}"></span></p>
-                        <p>Duration: <span th:text="${apiResponse.result.duration}"></span> minutes</p>
-                        <p>Number of Participants: <span th:text="${apiResponse.result.numOfParticipants}"></span></p>
-                        <p>Number of Sections: <span th:text="${apiResponse.result.numOfSections}"></span></p>
-                        <p>Number of Questions: <span th:text="${apiResponse.result.numOfQuestions}"></span></p>
-                        <p>Description: <span th:text="${apiResponse.result.description}"></span></p>
-                        <hr>
-                        <p class="mb-0">You can now add questions to this exam.</p>
-                    </div>
-
                     <!-- Error message -->
-                    <div id="errorMessage" class="alert alert-danger d-none" role="alert">
+                    <div th:if="${error}" class="alert alert-danger" role="alert">
                         <h4 class="alert-heading">Error!</h4>
-                        <p id="errorText"></p>
+                        <p th:text="${error}"></p>
                     </div>
 
-                    <form id="toeicExamForm" th:action="@{/admin/create-toeic-exam}" th:object="${toeicExamCreateRequest}" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    <form id="toeicExamForm" th:action="@{/admin/create-toeic-exam}"
+                          method="post"
+                          enctype="multipart/form-data"
+                          class="needs-validation" novalidate>
+
                         <div class="mb-3">
                             <label for="examName" class="form-label required-field">Exam Name</label>
                             <input type="text" class="form-control" id="examName" name="examName" required>
@@ -108,19 +100,15 @@
                             <div id="commentsContainer">
                                 <div class="comment-item">
                                     <input type="text" class="form-control" name="comments[]" placeholder="Enter a comment">
-                                    <button type="button" class="btn btn-danger btn-sm remove-comment" disabled>
-                                        <i class="bi bi-trash"></i> Remove
-                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm remove-comment" disabled>Remove</button>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-secondary btn-sm mt-2" id="addCommentBtn">
-                                <i class="bi bi-plus-circle"></i> Add Another Comment
-                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm mt-2" id="addCommentBtn">Add Another Comment</button>
                         </div>
 
                         <div class="mb-3">
                             <label for="audioFile" class="form-label required-field">Audio File</label>
-                            <input type="file" class="form-control" id="audioFile" name="audio" accept="audio/*" required>
+                            <input type="file" class="form-control" id="audioFile" name="audioFile" accept="audio/*" required>
                             <div class="invalid-feedback">
                                 Please upload an audio file.
                             </div>
@@ -143,144 +131,48 @@
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js"></script>
+<!-- Scripts -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Form validation
-        const form = document.getElementById('toeicExamForm');
-
-        // Audio file preview
-        const audioFile = document.getElementById('audioFile');
-        const audioPreview = document.getElementById('audioPreview');
-        const audioPlayer = document.getElementById('audioPlayer');
-
-        audioFile.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                audioPlayer.src = url;
-                audioPreview.style.display = 'block';
-            } else {
-                audioPreview.style.display = 'none';
-            }
-        });
-
-        // Comments functionality
-        const commentsContainer = document.getElementById('commentsContainer');
-        const addCommentBtn = document.getElementById('addCommentBtn');
-
-        addCommentBtn.addEventListener('click', function() {
-            const commentItem = document.createElement('div');
-            commentItem.className = 'comment-item';
-            commentItem.innerHTML = `
+    // Add/Remove comment input
+    $('#addCommentBtn').on('click', function () {
+        $('#commentsContainer').append(`
+            <div class="comment-item">
                 <input type="text" class="form-control" name="comments[]" placeholder="Enter a comment">
-                <button type="button" class="btn btn-danger btn-sm remove-comment">
-                    <i class="bi bi-trash"></i> Remove
-                </button>
-            `;
-            commentsContainer.appendChild(commentItem);
-
-            // Enable all remove buttons when there's more than one comment
-            const removeButtons = document.querySelectorAll('.remove-comment');
-            if (removeButtons.length > 1) {
-                removeButtons.forEach(button => {
-                    button.disabled = false;
-                });
-            }
-        });
-
-        // Event delegation for remove comment buttons
-        commentsContainer.addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-comment') || e.target.parentElement.classList.contains('remove-comment')) {
-                const button = e.target.classList.contains('remove-comment') ? e.target : e.target.parentElement;
-                const commentItem = button.parentElement;
-                commentItem.remove();
-
-                // Disable the last remove button if only one comment remains
-                const removeButtons = document.querySelectorAll('.remove-comment');
-                if (removeButtons.length === 1) {
-                    removeButtons[0].disabled = true;
-                }
-            }
-        });
-
-        // Reset button
-        const resetBtn = document.getElementById('resetBtn');
-        resetBtn.addEventListener('click', function() {
-            form.reset();
-            audioPreview.style.display = 'none';
-
-            // Reset comments to just one empty comment
-            commentsContainer.innerHTML = `
-                <div class="comment-item">
-                    <input type="text" class="form-control" name="comments[]" placeholder="Enter a comment">
-                    <button type="button" class="btn btn-danger btn-sm remove-comment" disabled>
-                        <i class="bi bi-trash"></i> Remove
-                    </button>
-                </div>
-            `;
-        });
-
-        // Form submission
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            if (!form.checkValidity()) {
-                e.stopPropagation();
-                form.classList.add('was-validated');
-                return;
-            }
-
-            // Create form data for file upload
-            const formData = new FormData();
-
-            // Get audio file
-            const audioFile = document.getElementById('audioFile').files[0];
-            formData.append('audio', audioFile);
-
-            // Create exam JSON object
-            const examData = {
-                examName: document.getElementById('examName').value,
-                duration: parseInt(document.getElementById('duration').value),
-                numOfParticipants: parseInt(document.getElementById('numOfParticipants').value),
-                numOfSections: parseInt(document.getElementById('numOfSections').value),
-                numOfQuestions: parseInt(document.getElementById('numOfQuestions').value),
-                description: document.getElementById('description').value,
-                comments: Array.from(document.querySelectorAll('input[name="comments[]"]'))
-                    .map(input => input.value)
-                    .filter(comment => comment.trim() !== '')
-            };
-
-            // Add exam data as JSON string
-            formData.append('exam', JSON.stringify(examData));
-
-            // Submit the form
-            fetch('/toeic-exam/create', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Redirect to the same page with success parameter
-                window.location.href ='/admin/toeic?success=true'
-            })
-            .catch(error => {
-                // Show error message
-                const errorMessage = document.getElementById('errorMessage');
-                const errorText = document.getElementById('errorText');
-                errorText.textContent = error.message || 'An error occurred while creating the exam.';
-                errorMessage.classList.remove('d-none');
-
-                // Scroll to error message
-                errorMessage.scrollIntoView({ behavior: 'smooth' });
-            });
-        });
+                <button type="button" class="btn btn-danger btn-sm remove-comment">Remove</button>
+            </div>
+        `);
     });
+
+    $(document).on('click', '.remove-comment', function () {
+        $(this).closest('.comment-item').remove();
+    });
+
+    // Audio preview
+    $('#audioFile').on('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            $('#audioPlayer').attr('src', url);
+            $('#audioPreview').show();
+        } else {
+            $('#audioPreview').hide();
+        }
+    });
+
+    // Bootstrap validation
+    (() => {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
 </script>
 </body>
 </html>

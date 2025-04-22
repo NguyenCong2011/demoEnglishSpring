@@ -9,9 +9,11 @@ import com.example.english.demo.entity.ToeicExam;
 import com.example.english.demo.exception.AppException;
 import com.example.english.demo.exception.ErrorCode;
 import com.example.english.demo.repository.ToeicExamRepository;
+import com.example.english.demo.service.FileUploadService;
 import com.example.english.demo.service.ToeicExamService;
 import com.example.english.demo.service.ToeicQuestionService;
 import com.example.english.demo.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +31,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController {
 
-    public final ToeicQuestionService toeicQuestionService;
+    private final ToeicQuestionService toeicQuestionService;
 
-    public  final ToeicExamRepository toeicExamRepository;
+    private  final ToeicExamRepository toeicExamRepository;
 
-    public  final ToeicExamService toeicExamService;
+    private  final ToeicExamService toeicExamService;
 
-    public  final UserService userService;
+    private final FileUploadService fileUploadService;
 
     @GetMapping("/create-toeic-exam")
     public String showCreateToeicExamPage(Model model) {
@@ -42,15 +45,17 @@ public class AdminController {
         return "admin/createToeicExam";
     }
 
+
     @PostMapping("/create-toeic-exam")
-    public String createToeicExam(@ModelAttribute @Valid ToeicExamCreateRequest toeicExamCreateRequest, Model model) {
-        ApiResponse<ToeicExamResponse> apiResponse = new ApiResponse<>();
+    public String createToeicExam(@ModelAttribute @Valid ToeicExamCreateRequest toeicExamCreateRequest,
+                                  Model model) {
         try {
+            String audioFileName = fileUploadService.uploadAudioFile(toeicExamCreateRequest.getAudioFile());
+            toeicExamCreateRequest.setAudio(audioFileName);
             ToeicExamResponse toeicExamResponse = toeicExamService.createToeicExam(toeicExamCreateRequest);
-            apiResponse.setResult(toeicExamResponse);
             return "redirect:/admin/toeic";
         } catch (Exception e) {
-            model.addAttribute("error", "Failed to create TOEIC exam");
+            model.addAttribute("error", "Failed to create TOEIC exam: " + e.getMessage());
             model.addAttribute("toeicExamCreateRequest", toeicExamCreateRequest);
             return "admin/createToeicExam";
         }

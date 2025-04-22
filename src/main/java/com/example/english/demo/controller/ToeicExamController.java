@@ -27,30 +27,30 @@ public class ToeicExamController {
     private final ToeicExamService toeicExamService;
 
     private final FileUploadService fileUploadService;
-
-    @PostMapping("/create")
-    public ApiResponse<ToeicExamResponse> createToeicExam(
-            @RequestParam("exam") String examJson,
-            @RequestParam("audio") MultipartFile audioFile) throws IOException {
-
-        // Tạo ApiResponse
-        ApiResponse<ToeicExamResponse> apiResponse = new ApiResponse<>();
-
-        // Xử lý tải lên tệp audio
-        String audioFileName = fileUploadService.uploadAudioFile(audioFile);
-
-        // Chuyển đổi examJson từ JSON thành đối tượng ToeicExamCreateRequest
-        ObjectMapper objectMapper = new ObjectMapper();
-        ToeicExamCreateRequest examRequest = objectMapper.readValue(examJson, ToeicExamCreateRequest.class);
-
-        examRequest.setAudio(audioFileName);
-
-        ToeicExamResponse response = toeicExamService.createToeicExam(examRequest);
-
-        apiResponse.setResult(response);
-
-        return apiResponse;
-    }
+//
+//    @PostMapping("/create")
+//    public ApiResponse<ToeicExamResponse> createToeicExam(
+//            @RequestParam("exam") String examJson,
+//            @RequestParam("audio") MultipartFile audioFile) throws IOException {
+//
+//        // Tạo ApiResponse
+//        ApiResponse<ToeicExamResponse> apiResponse = new ApiResponse<>();
+//
+//        // Xử lý tải lên tệp audio
+//        String audioFileName = fileUploadService.uploadAudioFile(audioFile);
+//
+//        // Chuyển đổi examJson từ JSON thành đối tượng ToeicExamCreateRequest
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        ToeicExamCreateRequest examRequest = objectMapper.readValue(examJson, ToeicExamCreateRequest.class);
+//
+//        examRequest.setAudio(audioFileName);
+//
+//        ToeicExamResponse response = toeicExamService.createToeicExam(examRequest);
+//
+//        apiResponse.setResult(response);
+//
+//        return apiResponse;
+//    }
 
 
 //    @PostMapping("/create")
