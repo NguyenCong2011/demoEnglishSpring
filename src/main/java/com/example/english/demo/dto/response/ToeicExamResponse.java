@@ -1,5 +1,6 @@
 package com.example.english.demo.dto.response;
 
+import com.example.english.demo.entity.Comment;
 import com.example.english.demo.entity.ToeicQuestion;
 import lombok.*;
 
@@ -16,7 +17,7 @@ public class ToeicExamResponse {
     private String examName;
     private int duration;
     private int numOfParticipants;
-    private List<String> comments;
+    private List<Comment> comments;
     private int numOfSections;
     private int numOfQuestions;
     private String description;

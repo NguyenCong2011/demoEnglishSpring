@@ -22,7 +22,6 @@ public class ToeicExam{
     private String examName;
     private int duration;
     private int numOfParticipants;
-    private List<String> comments;
     private int numOfSections;
     private int numOfQuestions;
     private String description;
@@ -30,4 +29,8 @@ public class ToeicExam{
 
     @OneToMany(mappedBy = "toeicExam")
     private List<ToeicQuestion> toeicQuestions;
+
+    @OneToMany(mappedBy = "toeicExam", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
 }
