@@ -143,7 +143,7 @@
     <a href="/online-tests"><div>Tất cả</div></a>
     <a href="/ielts-academic"><div>IELTS Academic</div></a>
     <a href="/ielts-general"><div>IELTS General</div></a>
-    <a href="/admin/toeic"><div>TOEIC</div></a>
+    <a href="/user/toeic"><div>TOEIC</div></a>
     <a href="/hsk-1"><div>HSK 1</div></a>
     <a href="/hsk-2"><div>HSK 2</div></a>
     <a href="/hsk-3"><div>HSK 3</div></a>
@@ -177,14 +177,12 @@
   <div id="search-results"></div>
 </div>
 <div class="content-container">
-  <a href="http://localhost:8080/admin/create-toeic-exam">Create TOEIC Exam</a>
   <div><strong>Total Exams:</strong> <span th:text="${listToeicExams.totalElements}"></span></div>
 
   <!-- Hiển thị các bài thi theo từng trang -->
   <div class="test-list">
     <div th:each="toeicExam : ${listToeicExams.content}">
-      <!--            <a th:href="@{/admin/create-toeic-question/{examId}(examId=${toeicExam.examId})}" method="get">-->
-      <a th:href="@{/admin/show-toeic-question/{examId}(examId=${toeicExam.examId})}">
+      <a th:href="@{/user/show-toeic-question/{examId}(examId=${toeicExam.examId})}">
         <p><strong>Exam Name:</strong> <span th:text="${toeicExam.examName}"></span></p>
         <p><strong>Duration:</strong> <span th:text="${toeicExam.duration}"></span> minutes</p>
         <p><strong>Number of Participants:</strong> <span th:text="${toeicExam.numOfParticipants}"></span></p>
@@ -202,7 +200,7 @@
   <!-- Phân trang -->
   <div class="pagination" th:if="${listToeicExams.totalElements > 0}">
     <a th:each="pageNum : ${#numbers.sequence(1, listToeicExams.totalPages)}"
-       th:href="@{/admin/toeic(pageNo=${pageNum})}"
+       th:href="@{/user/toeic(pageNo=${pageNum})}"
        th:text="${pageNum}"
        th:classappend="${pageNum == currentPage} ? 'active' : ''"></a>
   </div>

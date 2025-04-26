@@ -25,5 +25,11 @@ public class User {
     private boolean active;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    Set<Role> roles;
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_name")
+    )
+    private Set<Role> roles;
+
 }

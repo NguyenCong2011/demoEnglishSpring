@@ -1,6 +1,10 @@
 package com.example.english.demo.controller;
 
 import com.example.english.demo.dto.request.AuthenticationRequest;
+import com.example.english.demo.entity.User;
+import com.example.english.demo.exception.AppException;
+import com.example.english.demo.exception.ErrorCode;
+import com.example.english.demo.repository.UserRepository;
 import com.example.english.demo.service.AuthenticationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class HomeController {
     private final AuthenticationService authenticationService;
+    private final UserRepository userRepository;
+
 
     @GetMapping("/")
     public String index(Model model) {
@@ -35,6 +41,15 @@ public class HomeController {
                                HttpServletResponse response,
                                Model model) {
         try {
+            var user = userRepository.findByUsername(request.getUsername())
+                    .filter(User::isActive)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
+
+            // Check quyền admin
+            if (authenticationService.isAdmin(user)) {
+                model.addAttribute("error", "Admin không được đăng nhập ở đây");
+                return "login";
+            }
             var result = authenticationService.authenticate(request);
 
             if (result.isAuthenticated()) {
@@ -56,6 +71,7 @@ public class HomeController {
         }
     }
 
+
     @RequestMapping("/about")
     public String about(Model model) {
         return "about";
@@ -66,9 +82,5 @@ public class HomeController {
         return "online-tests";
     }
 
-    @GetMapping("/toeic")
-    public String showToeicPage() {
-        return "toeic";
-    }
 
 }

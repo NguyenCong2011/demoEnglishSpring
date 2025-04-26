@@ -1,19 +1,21 @@
 package com.example.english.demo.controller;
 
 import com.example.english.demo.dto.request.ApiResponse;
+import com.example.english.demo.dto.request.AuthenticationRequest;
 import com.example.english.demo.dto.request.ToeicExamCreateRequest;
 import com.example.english.demo.dto.request.ToeicQuestionCreateRequest;
 import com.example.english.demo.dto.response.ToeicExamResponse;
 import com.example.english.demo.dto.response.ToeicQuestionResponse;
 import com.example.english.demo.entity.ToeicExam;
+import com.example.english.demo.entity.User;
 import com.example.english.demo.exception.AppException;
 import com.example.english.demo.exception.ErrorCode;
 import com.example.english.demo.repository.ToeicExamRepository;
-import com.example.english.demo.service.FileUploadService;
-import com.example.english.demo.service.ToeicExamService;
-import com.example.english.demo.service.ToeicQuestionService;
-import com.example.english.demo.service.UserService;
+import com.example.english.demo.repository.UserRepository;
+import com.example.english.demo.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -38,6 +40,52 @@ public class AdminController {
     private  final ToeicExamService toeicExamService;
 
     private final FileUploadService fileUploadService;
+
+    private final AuthenticationService authenticationService;
+
+    private final UserRepository userRepository;
+
+    @GetMapping("/login")
+    public String showAdminLoginPage() {
+        return "admin/login";
+    }
+
+    @PostMapping("/login")
+    public String processAdminLogin(@ModelAttribute @Valid AuthenticationRequest request,
+                                    HttpServletResponse response,
+                                    Model model) {
+        try {
+            var user = userRepository.findByUsername(request.getUsername())
+                    .filter(User::isActive)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
+
+            // Check quyền admin
+            if (!authenticationService.isAdmin(user)) {
+                model.addAttribute("error", "Bạn không có quyền truy cập trang admin!");
+                return "admin/login";
+            }
+
+            // Nếu là admin thì tiếp tục xác thực nhé
+            var result = authenticationService.authenticate(request);
+
+            if (result.isAuthenticated()) {
+                Cookie cookie = new Cookie("jwt", result.getToken());
+                cookie.setHttpOnly(true);
+                cookie.setPath("/");
+                cookie.setMaxAge(7 * 24 * 60 * 60);
+                response.addCookie(cookie);
+
+                return "redirect:/";
+            } else {
+                model.addAttribute("error", "Authentication failed");
+                return "admin/login";
+            }
+
+        } catch (Exception e) {
+            model.addAttribute("error", "Sai tài khoản hoặc mật khẩu hoặc không phải admin.");
+            return "admin/login";
+        }
+    }
 
     @GetMapping("/create-toeic-exam")
     public String showCreateToeicExamPage(Model model) {
@@ -101,20 +149,6 @@ public class AdminController {
             return "admin/createExamQuestion";
         }
     }
-
-//    @GetMapping("/show-toeic-question/{examId}")
-//    public String showQuestionsByExamIdAndPart(
-//            @PathVariable Long examId,
-//            @RequestParam(defaultValue = "1") Integer part,
-//            Model model) {
-//
-//        List<ToeicQuestionResponse> toeicQuestionResponses = toeicQuestionService.getToeicQuestionsByPart(examId, part);
-//
-//        model.addAttribute("toeicQuestions", toeicQuestionResponses);
-//        model.addAttribute("examId", examId);
-//        model.addAttribute("part", part);
-//        return "admin/showExamQuestionByPart";
-//    }
 
     @GetMapping("/show-toeic-question/{examId}")
     public String showQuestionsByExamIdAndPart(

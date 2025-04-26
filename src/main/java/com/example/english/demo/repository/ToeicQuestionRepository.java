@@ -12,5 +12,5 @@ public interface ToeicQuestionRepository extends JpaRepository<ToeicQuestion,Lon
 
     boolean existsByQuestionTextAndCorrectAnswerAndToeicExam_ExamId(String questionText, String correctAnswer, Long examId);
 
-
+    List<ToeicQuestion> findByToeicExam_ExamId(Long examId);
 }

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>TOEIC Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .question-item {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .part-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .part-links button {
+            padding: 10px;
+            background-color: #f1f1f1;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .part-links button.active,
+        .part-links button:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{header.html}"></div>
+
+<div class="content-container">
+    <div class="part-links">
+        <button onclick="filterPart(1)">Part 1</button>
+        <button onclick="filterPart(2)">Part 2</button>
+        <button onclick="filterPart(3)">Part 3</button>
+        <button onclick="filterPart(4)">Part 4</button>
+        <button onclick="filterPart(5)">Part 5</button>
+        <button onclick="filterPart(6)">Part 6</button>
+        <button onclick="filterPart(7)">Part 7</button>
+        <button onclick="filterPart('all')">Tất cả</button>
+    </div>
+
+    <div th:if="${toeicExam.audio != null and !toeicExam.audio.isEmpty()}">
+        <audio controls>
+            <source th:src="@{'/audio/' + ${toeicExam.audio}}" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <form method="post" th:action="@{/user/submit-toeic-exam}">
+        <input type="hidden" name="examId" th:value="${examId}" />
+
+        <div class="question-list">
+            <div th:each="question, iter : ${toeicQuestions}"
+                 th:attr="data-part=${question.part}"
+                 class="question-item">
+                <input type="hidden" name="questionIds" th:value="${question.questionId}" />
+
+                <img th:if="${question.image != null}" th:src="@{${question.image}}" alt="Image"
+                     style="max-width: 300px;" />
+
+                <p><strong>Question [[${iter.index + 1}]] (Part [[${question.part}]]):</strong>
+                    <span th:text="${question.questionText}"></span></p>
+
+                <label><input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 1'" />
+                    <span th:text="${question.dapAn1}"></span></label><br/>
+
+                <label><input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 2'" />
+                    <span th:text="${question.dapAn2}"></span></label><br/>
+
+                <label><input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 3'" />
+                    <span th:text="${question.dapAn3}"></span></label><br/>
+
+                <label><input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 4'" />
+                    <span th:text="${question.dapAn4}"></span></label><br/>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+            <button type="submit">Nộp bài</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function filterPart(part) {
+        const items = document.querySelectorAll('.question-item');
+        items.forEach(item => {
+            const itemPart = item.getAttribute('data-part');
+            if (part === 'all' || itemPart === String(part)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        document.querySelectorAll('.part-links button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        if (part === 'all') {
+            document.querySelector('.part-links button:last-child').classList.add('active');
+        } else {
+            document.querySelectorAll('.part-links button')[part - 1].classList.add('active');
+        }
+    }
+
+    // Load mặc định tất cả
+    window.onload = function () {
+        filterPart('all');
+    };
+</script>
+
+<div th:replace="~{footer.html}"></div>
+</body>
+</html>

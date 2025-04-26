@@ -159,59 +159,6 @@ public class ToeicQuestionService {
     }
 
 
-//    public List<ToeicQuestionResponse> importToeicQuestionsFromExcel(MultipartFile file, Long examId) {
-//        List<ToeicQuestionResponse> responses = new ArrayList<>();
-//
-//        ToeicExam toeicExam = toeicExamRepository.findById(examId)
-//                .orElseThrow(() -> new AppException(ErrorCode.TOEIC_EXAM_NOT_EXITSTED));
-//
-//        try (InputStream inputStream = file.getInputStream();
-//             Workbook workbook = new XSSFWorkbook(inputStream)) {
-//
-//            Sheet sheet = workbook.getSheetAt(0);
-//
-//            for (Row row : sheet) {
-//                if (row.getRowNum() == 0) continue;
-//
-//                String questionText = getCellValue(row.getCell(0));
-//                String dapAn1 = getCellValue(row.getCell(1));
-//                String dapAn2 = getCellValue(row.getCell(2));
-//                String dapAn3 = getCellValue(row.getCell(3));
-//                String dapAn4 = getCellValue(row.getCell(4)); // có thể trống
-//                String correctAnswer = getCellValue(row.getCell(5));
-//
-//                if (questionText.isBlank() || dapAn1.isBlank() || dapAn2.isBlank()
-//                        || dapAn3.isBlank() || correctAnswer.isBlank()) {
-//                    continue; // bỏ dòng thiếu thông tin bắt buộc
-//                }
-//
-//                int part = (int) row.getCell(6).getNumericCellValue();
-//
-//                ToeicQuestionCreateRequest request = ToeicQuestionCreateRequest.builder()
-//                        .questionText(questionText)
-//                        .dapAn1(dapAn1)
-//                        .dapAn2(dapAn2)
-//                        .dapAn3(dapAn3)
-//                        .dapAn4(dapAn4)
-//                        .correctAnswer(correctAnswer)
-//                        .part(part)
-//                        .build();
-//
-//                ToeicQuestion question = toeicQuestionMapper.toToeicQuestion(request);
-//                question.setToeicExam(toeicExam);
-//                toeicQuestionRepository.save(question);
-//
-//                responses.add(toeicQuestionMapper.toToeicQuestionResponse(question));
-//            }
-//
-//        } catch (IOException e) {
-//            throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
-//        }
-//
-//        return responses;
-//    }
-
-
     private String getCellValue(Cell cell) {
         if (cell == null) return "";
         return switch (cell.getCellType()) {
@@ -220,6 +167,18 @@ public class ToeicQuestionService {
             case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
             default -> "";
         };
+    }
+
+    public ToeicQuestion findById(Long questionId) {
+        return toeicQuestionRepository.findById(questionId)
+                .orElseThrow(() -> new AppException(ErrorCode.TOEIC_QUESTION_NOT_EXITSTED));
+    }
+
+    public List<ToeicQuestionResponse> getToeicQuestionsByExamId(Long examId) {
+        List<ToeicQuestion> toeicQuestions = toeicQuestionRepository.findByToeicExam_ExamId(examId);
+        return toeicQuestions.stream()
+                .map(toeicQuestionMapper::toToeicQuestionResponse)
+                .collect(Collectors.toList());
     }
 
 

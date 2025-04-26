@@ -18,7 +18,8 @@ public enum ErrorCode {
     TOEIC_EXAM_EXITSTED(155575,"Exxam existed",HttpStatus.BAD_REQUEST),
     TOEIC_EXAM_NOT_EXITSTED(1555875,"Exxam not existed",HttpStatus.BAD_REQUEST),
     FILE_UPLOAD_ERROR(1565435875,"file not = not existed",HttpStatus.BAD_REQUEST),
-    TOEIC_QUESTION_EXITSTED(1555775,"Question existed",HttpStatus.BAD_REQUEST);
+    TOEIC_QUESTION_EXITSTED(1555775,"Question existed",HttpStatus.BAD_REQUEST),
+    TOEIC_QUESTION_NOT_EXITSTED(1555775,"Question not existed",HttpStatus.BAD_REQUEST);
 
 
     private int code;

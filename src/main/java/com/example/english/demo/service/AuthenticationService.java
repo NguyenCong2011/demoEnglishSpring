@@ -57,9 +57,9 @@ public class AuthenticationService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-        boolean authenticated1 = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
-        if (!authenticated1) {
+        if (!authenticated) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
@@ -218,6 +218,13 @@ public class AuthenticationService {
         } catch (JOSEException e) {
             throw new RuntimeException("Unable to sign confirmation token", e);
         }
+    }
+
+    public boolean isAdmin(User user) {
+        if (user.getRoles() == null) return false;
+
+        return user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
     }
 
 

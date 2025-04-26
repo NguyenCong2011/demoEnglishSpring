@@ -35,23 +35,6 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final EmailSenderService emailSenderService;
 
-    //  trước là public User nhưng mà chúng ta không trả về tất cả các dữ liệu của User nên phải tạo UserResponse
-//    public UserResponse createUser(UserCreateRequest request){
-//        //
-//        if(userRepository.existsByUsername(request.getUsername())){
-//            throw new AppException(ErrorCode.USER_EXITSTED);
-//        }
-//        //
-//        User user=userMapper.toUser(request);
-//        //
-//        user.setPassword(passwordEncoder.encode(request.getPassword()));
-//        //
-//        HashSet<String> roles=new HashSet<>();
-//        roles.add(Roles.USER.name());
-//
-//        return userMapper.toUserResponse(userRepository.save(user));
-//    }
-
     @PostAuthorize("returnObject.owner == authentication.name")//dòng log bên dưới vẫn được in ra kể cả k phải admin,tức là ngược với preauthorize
     public UserResponse getUserById(String id){
         log.info("in method get by id");
@@ -92,20 +75,6 @@ public class UserService {
 
         return userMapper.toUserResponse(user);
     }
-
-//    private final JavaMailSender mailSender;
-//
-//    public void sendConfirmationEmail(String email) {
-//        String token = UUID.randomUUID().toString();
-//        String confirmationLink = "http://localhost:8080/user/confirm?token=" + token;
-//
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setTo(email);
-//        message.setSubject("Xác nhận đăng ký");
-//        message.setText("Nhấn vào link để xác nhận: " + confirmationLink);
-//
-//        mailSender.send(message);
-//    }
 
     public UserResponse createUser(UserCreateRequest request){
         //

@@ -1,27 +1,38 @@
 package com.example.english.demo.controller;
 
-import com.example.english.demo.dto.request.IntrospectRequest;
-import com.example.english.demo.entity.User;
-import com.example.english.demo.repository.UserRepository;
-import com.example.english.demo.service.AuthenticationService;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jwt.SignedJWT;
-import org.springframework.stereotype.Controller;
-
 import com.example.english.demo.dto.request.ApiResponse;
+import com.example.english.demo.dto.request.IntrospectRequest;
 import com.example.english.demo.dto.request.UserCreateRequest;
 import com.example.english.demo.dto.request.UserUpdateRequest;
+import com.example.english.demo.dto.response.ToeicExamResponse;
+import com.example.english.demo.dto.response.ToeicQuestionResponse;
 import com.example.english.demo.dto.response.UserResponse;
-import com.example.english.demo.service.UserService;
+import com.example.english.demo.entity.ToeicExam;
+import com.example.english.demo.entity.ToeicQuestion;
+import com.example.english.demo.entity.User;
+import com.example.english.demo.exception.AppException;
+import com.example.english.demo.exception.ErrorCode;
+import com.example.english.demo.repository.ToeicExamRepository;
+import com.example.english.demo.repository.ToeicQuestionRepository;
+import com.example.english.demo.repository.UserRepository;
+import com.example.english.demo.service.*;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -30,32 +41,14 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
     private final UserRepository userRepository;
+    private final ToeicExamService toeicExamService;
 
-//    @PostMapping("/create")
-//    public String createUser(@ModelAttribute @Valid UserCreateRequest request, Model model) {
-//        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-//        try {
-//            UserResponse userResponse = userService.createUser(request);
-//            apiResponse.setResult(userResponse);
-//            return "redirect:/login";
-//        } catch (Exception e) {
-//            model.addAttribute("error", "Failed to create user");
-//            model.addAttribute("userCreateRequest", request);
-//            return "createUser";
-//        }
-//    }
+    private final ToeicQuestionService toeicQuestionService;
 
-//    @PostMapping("/create")
-//    public String createUser(@ModelAttribute @Valid UserCreateRequest request, Model model) {
-//        try {
-//            userService.sendConfirmationEmail(request.getEmail());
-//            model.addAttribute("message", "Đã gửi email xác nhận. Vui lòng kiểm tra hộp thư.");
-//            return "createUser"; // Hiển thị lại form + thông báo
-//        } catch (Exception e) {
-//            model.addAttribute("error", "Không thể gửi email xác nhận.");
-//            return "createUser";
-//        }
-//    }
+    private  final ToeicExamRepository toeicExamRepository;
+
+    private final ToeicQuestionRepository toeicQuestionRepository;
+
 
     @GetMapping("/create")
     public String createUserPage(Model model) {
@@ -103,6 +96,17 @@ public class UserController {
     }
 
 
+    @GetMapping("/toeic")
+    public String getToeicExams(@RequestParam(defaultValue = "1") int pageNo, Model model) {
+        Page<ToeicExamResponse> listToeicExams = toeicExamService.getToeicExams(pageNo);
+
+        model.addAttribute("listToeicExams", listToeicExams);
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("totalPages", listToeicExams.getTotalPages());
+
+        return "user/toeic";
+    }
+
 
     @GetMapping("/getAllUser")
     ApiResponse<List<UserResponse>> getUser(){
@@ -121,6 +125,73 @@ public class UserController {
                 .result(userService.getUserById(userId))
                 .build();
     }
+
+    @GetMapping("/show-toeic-question/{examId}")
+    public String showAllQuestionsByExamId(
+            @PathVariable Long examId,
+            Model model) {
+
+        // Lấy đề thi
+        ToeicExam toeicExam = toeicExamRepository.findById(examId)
+                .orElseThrow(() -> new AppException(ErrorCode.TOEIC_EXAM_NOT_EXITSTED));
+
+        // ✅ Lấy tất cả các câu hỏi trong đề thi đó
+        List<ToeicQuestionResponse> toeicQuestionResponses = toeicQuestionService.getToeicQuestionsByExamId(examId);
+
+        model.addAttribute("toeicExam", toeicExam);
+        model.addAttribute("toeicQuestions", toeicQuestionResponses);
+        model.addAttribute("examId", examId);
+        return "user/showExamQuestionByPart";
+    }
+
+
+    @PostMapping("/submit-toeic-exam")
+    public String submitToeicExam(
+            @RequestParam String examId,
+            @RequestParam Map<String, String> answers,
+            Model model) {
+
+        Long parsedExamId = Long.parseLong(examId);
+        List<ToeicQuestion> questions = toeicQuestionRepository.findByToeicExam_ExamId(parsedExamId);
+
+        Map<Integer, Integer> partCorrect = new HashMap<>();
+        Map<Integer, Integer> partTotal = new HashMap<>();
+
+        int totalCorrect = 0;
+        int totalQuestions = 0;
+
+        for (ToeicQuestion question : questions) {
+            Integer part = question.getPart();
+            partTotal.put(part, partTotal.getOrDefault(part, 0) + 1);
+            totalQuestions++;
+
+            String key = "answers[" + question.getQuestionId() + "]";
+            if (answers.containsKey(key)) {
+                String selectedAnswer = answers.get(key);
+                if (question.isCorrectAnswer(selectedAnswer)) {
+                    partCorrect.put(part, partCorrect.getOrDefault(part, 0) + 1);
+                    totalCorrect++;
+                }
+            }
+        }
+
+        List<Map<String, Object>> partResults = new ArrayList<>();
+        for (Integer part : partTotal.keySet()) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("part", part);
+            result.put("correct", partCorrect.getOrDefault(part, 0));
+            result.put("total", partTotal.get(part));
+            partResults.add(result);
+        }
+
+        model.addAttribute("examId", examId);
+        model.addAttribute("partResults", partResults);
+        model.addAttribute("totalCorrect", totalCorrect);
+        model.addAttribute("totalQuestions", totalQuestions);
+
+        return "user/toeicExamResult";
+    }
+
 
 
     @PutMapping("/{userId}")

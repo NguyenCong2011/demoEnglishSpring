@@ -84,7 +84,15 @@
     <a href="/online-tests"><div>Tất cả</div></a>
     <a href="/ielts-academic"><div>IELTS Academic</div></a>
     <a href="/ielts-general"><div>IELTS General</div></a>
-    <a href="/admin/toeic"><div>TOEIC</div></a>
+    <!-- Nếu là admin -->
+    <div sec:authorize="hasRole('ADMIN')">
+      <a href="/admin/toeic"><div>TOEIC</div></a>
+    </div>
+    <!-- Nếu không phải admin -->
+    <div sec:authorize="!hasRole('ADMIN')">
+      <a href="/user/toeic"><div>TOEIC</div></a>
+    </div>
+
     <a href="/hsk-1"><div>HSK 1</div></a>
     <a href="/hsk-2"><div>HSK 2</div></a>
     <a href="/hsk-3"><div>HSK 3</div></a>

@@ -142,13 +142,13 @@
     <div class="question-list">
         <div th:each="toeicQuestion : ${toeicQuestions}">
             <div class="question-item">
+                <img th:src="@{${toeicQuestion.image}}" alt="Image" style="max-width: 300px;" />
                 <p><strong>Question:</strong> <span th:text="${toeicQuestion.questionText}"></span></p>
                 <p><strong>Answer 1:</strong> <span th:text="${toeicQuestion.dapAn1}"></span></p>
                 <p><strong>Answer 2:</strong> <span th:text="${toeicQuestion.dapAn2}"></span></p>
                 <p><strong>Answer 3:</strong> <span th:text="${toeicQuestion.dapAn3}"></span></p>
                 <p><strong>Answer 4:</strong> <span th:text="${toeicQuestion.dapAn4}"></span></p>
                 <p><strong>Correct Answer:</strong> <span th:text="${toeicQuestion.correctAnswer}"></span></p>
-                <img th:src="@{${toeicQuestion.image}}" alt="Image" style="max-width: 300px;" />
             </div>
         </div>
     </div>

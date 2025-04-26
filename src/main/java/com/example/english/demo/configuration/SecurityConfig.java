@@ -20,7 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    String[] publicRoutes = {"/audio/**","/user/confirm-account/**","/admin/import-toeic-questions/{examId}","/images/**","/admin/show-toeic-question/{examId}","/admin/create-toeic-question/{examId}","/user/create","/auth/login","/login","/toeic","/online-tests","/","/admin/toeic","/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create","/toeic-exam/update/{examId}","/admin/create-toeic-exam"};
+    String[] publicRoutes = {"/user/submit-toeic-exam","/user/show-toeic-question/{examId}","/admin/login","/user/toeic","/audio/**","/user/confirm-account/**","/admin/import-toeic-questions/{examId}","/images/**","/admin/show-toeic-question/{examId}","/admin/create-toeic-question/{examId}","/user/create","/auth/login","/login","/toeic","/online-tests","/","/admin/toeic","/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create","/toeic-exam/update/{examId}","/admin/create-toeic-exam"};
 
     //@Value("${signer.key}")
     //private String Signer_Key;
