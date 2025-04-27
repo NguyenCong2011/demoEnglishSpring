@@ -61,7 +61,6 @@
         <button onclick="filterPart(5)">Part 5</button>
         <button onclick="filterPart(6)">Part 6</button>
         <button onclick="filterPart(7)">Part 7</button>
-        <button onclick="filterPart('all')">Tất cả</button>
     </div>
 
     <div th:if="${toeicExam.audio != null and !toeicExam.audio.isEmpty()}">
@@ -80,23 +79,31 @@
                  class="question-item">
                 <input type="hidden" name="questionIds" th:value="${question.questionId}" />
 
-                <img th:if="${question.image != null}" th:src="@{${question.image}}" alt="Image"
-                     style="max-width: 300px;" />
+                <img th:src="@{${question.image}}" alt="Image" style="max-width: 300px;" />
 
                 <p><strong>Question [[${iter.index + 1}]] (Part [[${question.part}]]):</strong>
                     <span th:text="${question.questionText}"></span></p>
 
-                <label><input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 1'" />
-                    <span th:text="${question.dapAn1}"></span></label><br/>
+                <label>
+                    <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 1'" />
+                    <span th:text="${question.dapAn1}"></span>
+                </label><br/>
 
-                <label><input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 2'" />
-                    <span th:text="${question.dapAn2}"></span></label><br/>
+                <label>
+                    <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 2'" />
+                    <span th:text="${question.dapAn2}"></span>
+                </label><br/>
 
-                <label><input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 3'" />
-                    <span th:text="${question.dapAn3}"></span></label><br/>
+                <label>
+                    <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 3'" />
+                    <span th:text="${question.dapAn3}"></span>
+                </label><br/>
 
-                <label><input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 4'" />
-                    <span th:text="${question.dapAn4}"></span></label><br/>
+                <!-- Chỉ hiển thị Answer 4 nếu Part khác 2 -->
+                <label th:if="${question.part != 2}">
+                    <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 4'" />
+                    <span th:text="${question.dapAn4}"></span>
+                </label><br th:if="${question.part != 2}" />
             </div>
         </div>
 
