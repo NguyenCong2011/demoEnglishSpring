@@ -47,11 +47,29 @@
         .hidden {
             display: none;
         }
+
+        /* Timer CSS */
+        #timer {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 20px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
+<!-- Header -->
 <div th:replace="~{header.html}"></div>
 
+<!-- Đồng hồ đếm ngược -->
+<div id="timer">120:00</div>
+
+<!-- Nội dung bài thi -->
 <div class="content-container">
     <div class="part-links">
         <button onclick="filterPart(1)">Part 1</button>
@@ -79,7 +97,9 @@
                  class="question-item">
                 <input type="hidden" name="questionIds" th:value="${question.questionId}" />
 
-                <img th:src="@{${question.image}}" alt="Image" style="max-width: 300px;" />
+                <div th:if="${question.image != null}">
+                    <img th:src="@{${question.image}}" alt="Question Image" style="max-width: 300px;" />
+                </div>
 
                 <p><strong>Question [[${iter.index + 1}]] (Part [[${question.part}]]):</strong>
                     <span th:text="${question.questionText}"></span></p>
@@ -113,6 +133,7 @@
     </form>
 </div>
 
+<!-- Script -->
 <script>
     function filterPart(part) {
         const items = document.querySelectorAll('.question-item');
@@ -135,12 +156,37 @@
         }
     }
 
-    // Load mặc định tất cả
+    function startTimer(duration, display) {
+        let timer = duration, minutes, seconds;
+        setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                // Hết giờ thì submit bài
+                alert("Hết giờ! Bài thi sẽ được nộp tự động.");
+                document.querySelector('form').submit();
+            }
+        }, 1000);
+    }
+
+    // Khi trang load xong
     window.onload = function () {
-        filterPart('all');
+        filterPart(1); // Load tất cả câu hỏi ban đầu
+
+        const timeLimit = 120 * 60; // 120 phút -> giây
+        const display = document.getElementById('timer');
+        startTimer(timeLimit, display);
     };
 </script>
 
+<!-- Footer -->
 <div th:replace="~{footer.html}"></div>
+
 </body>
 </html>

@@ -182,7 +182,7 @@
   <!-- Hiển thị các bài thi theo từng trang -->
   <div class="test-list">
     <div th:each="toeicExam : ${listToeicExams.content}">
-      <a th:href="@{/user/show-toeic-question/{examId}(examId=${toeicExam.examId})}">
+      <a th:href="@{/user/toeic-detail/{examId}(examId=${toeicExam.examId})}">
         <p><strong>Exam Name:</strong> <span th:text="${toeicExam.examName}"></span></p>
         <p><strong>Duration:</strong> <span th:text="${toeicExam.duration}"></span> minutes</p>
         <p><strong>Number of Participants:</strong> <span th:text="${toeicExam.numOfParticipants}"></span></p>

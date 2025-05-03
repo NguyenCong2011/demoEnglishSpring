@@ -50,6 +50,7 @@ public class UserController {
     private final ToeicQuestionRepository toeicQuestionRepository;
 
 
+
     @GetMapping("/create")
     public String createUserPage(Model model) {
         model.addAttribute("userCreateRequest",new UserCreateRequest());
@@ -192,6 +193,52 @@ public class UserController {
         return "user/toeicExamResult";
     }
 
+
+    @GetMapping("/toeic-detail/{examId}")
+    public String showToeicDetail(@PathVariable Long examId, Model model) {
+        ToeicExam toeicExam = toeicExamRepository.findById(examId)
+                .orElseThrow(() -> new AppException(ErrorCode.TOEIC_EXAM_NOT_EXITSTED));
+
+        // Lấy thông tin người dùng đang đăng nhập
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        User currentUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
+
+        model.addAttribute("toeicExam", toeicExam);
+        model.addAttribute("examId", examId);
+        model.addAttribute("currentUserId", currentUser.getId());
+        model.addAttribute("currentUsername", currentUser.getUsername());
+
+        return "user/toeicDetail";
+    }
+
+
+
+    @GetMapping("/search-users")
+    @ResponseBody
+    public ApiResponse<?> searchUsers(@RequestParam("keyword") String keyword) {
+        List<User> users = userService.searchUsersByKeyword(keyword);
+
+        if (users.isEmpty()) {
+            return ApiResponse.builder()
+                    .message("Không tìm thấy người dùng nào.")
+                    .result(new ArrayList<>())
+                    .build();
+        }
+
+        List<Map<String, String>> result = new ArrayList<>();
+        for (User user : users) {
+            Map<String, String> userInfo = new HashMap<>();
+            userInfo.put("id", user.getId());
+            userInfo.put("username", user.getUsername());
+            result.add(userInfo);
+        }
+
+        return ApiResponse.builder()
+                .result(result)
+                .build();
+    }
 
 
     @PutMapping("/{userId}")

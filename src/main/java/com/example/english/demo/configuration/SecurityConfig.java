@@ -20,7 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    String[] publicRoutes = {"/user/submit-toeic-exam","/user/show-toeic-question/{examId}","/admin/login","/user/toeic","/audio/**","/user/confirm-account/**","/admin/import-toeic-questions/{examId}","/images/**","/admin/show-toeic-question/{examId}","/admin/create-toeic-question/{examId}","/user/create","/auth/login","/login","/toeic","/online-tests","/","/admin/toeic","/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create","/toeic-exam/update/{examId}","/admin/create-toeic-exam"};
+    String[] publicRoutes = {"/ws/**", "/topic/**","/app/invite","/app/accept-invite","/app/reject-invite", "/topic/invite/{userId}","/user/search-users","/user/toeic-detail/{examId}","/competition","/user/friends","/user/submit-toeic-exam","/user/show-toeic-question/{examId}","/admin/login","/user/toeic","/audio/**","/user/confirm-account/**","/admin/import-toeic-questions/{examId}","/images/**","/admin/show-toeic-question/{examId}","/admin/create-toeic-question/{examId}","/user/create","/auth/login","/login","/toeic","/online-tests","/","/admin/toeic","/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create","/toeic-exam/update/{examId}","/admin/create-toeic-exam"};
 
     //@Value("${signer.key}")
     //private String Signer_Key;
@@ -48,7 +48,6 @@ public class SecurityConfig {
     //override Bean Granted là giả dụ và giả dụ xong phải authen và nó bắt buộc phải có là admin thì mới được truy cập k cả có token hợp le
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter(){
-
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter=new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 

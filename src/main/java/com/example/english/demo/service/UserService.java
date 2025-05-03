@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -102,4 +103,19 @@ public class UserService {
         emailSenderService.sendMail(mailMessage);
         return userMapper.toUserResponse(user);
     }
+
+    public List<User> searchUsersByKeyword(String keyword) {
+        return userRepository.findByUsernameContainingIgnoreCase(keyword);
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        String username = authentication.getName();
+        return userRepository.findByEmail(username);
+    }
+
 }
