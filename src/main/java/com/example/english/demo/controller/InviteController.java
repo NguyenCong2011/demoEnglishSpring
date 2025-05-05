@@ -1,8 +1,13 @@
 package com.example.english.demo.controller;
 
+import com.example.english.demo.entity.CompetitionResult;
 import com.example.english.demo.entity.Invitation;
 import com.example.english.demo.entity.InviteMessage;
-import com.example.english.demo.service.CompetitionResultService;
+import com.example.english.demo.entity.ToeicExam;
+import com.example.english.demo.entity.User;
+import com.example.english.demo.repository.CompetitionResultRepository;
+import com.example.english.demo.repository.ToeicExamRepository;
+import com.example.english.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -19,7 +24,9 @@ import java.util.UUID;
 public class InviteController {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final CompetitionResultService competitionResultService;
+    private final CompetitionResultRepository competitionResultRepository;
+    private final UserRepository userRepository;
+    private final ToeicExamRepository toeicExamRepository;
 
     @MessageMapping("/invite")
     public void sendInvite(@Payload InviteMessage message) {
@@ -31,6 +38,27 @@ public class InviteController {
 
         log.info("Received accept invite from {} to {} in room {}",
                 message.getReceiverId(), message.getSenderId(), message.getRoomId());
+
+        // Fetch users and exam
+        User user1 = userRepository.findById(message.getSenderId()).orElse(null);
+        User user2 = userRepository.findById(message.getReceiverId()).orElse(null);
+        ToeicExam exam = toeicExamRepository.findById(message.getExamId()).orElse(null);
+
+        if (user1 != null && user2 != null && exam != null) {
+            // Create and save CompetitionResult
+            CompetitionResult competitionResult = new CompetitionResult();
+            competitionResult.setRoomId(roomId);
+            competitionResult.setUser1(user1);
+            competitionResult.setUser2(user2);
+            competitionResult.setExam(exam);
+            competitionResult.setUser1Score(0); // Initialize scores
+            competitionResult.setUser2Score(0); // Initialize scores
+            competitionResultRepository.save(competitionResult);
+            log.info("Saved CompetitionResult for room {}", roomId);
+        } else {
+            log.error("Failed to save CompetitionResult: User(s) or Exam not found.");
+        }
+
 
         String destination = "/topic/invite/" + message.getReceiverId();
         log.info("Sending invite to destination: {}", destination);
@@ -48,7 +76,7 @@ public class InviteController {
         messagingTemplate.convertAndSend("/topic/accept/" + invite.getReceiverId(), invite);
 
         // Notify both users about the competition room
-        messagingTemplate.convertAndSend("/topic/competition/" + invite.getRoomId(), 
+        messagingTemplate.convertAndSend("/topic/competition/" + invite.getRoomId(),
             Map.of("status", "started", "roomId", invite.getRoomId()));
     }
 
