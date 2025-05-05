@@ -53,7 +53,64 @@
     a:hover {
       text-decoration: underline;
     }
+
+    .competition-status {
+      margin-top: 30px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .competition-waiting {
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    .competition-complete {
+      font-weight: bold;
+    }
+
+    .win {
+      color: green;
+    }
+
+    .lose {
+      color: red;
+    }
+
+    .draw {
+      color: orange;
+    }
+
+    .action-buttons {
+      margin-top: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid #007bff;
+      color: #007bff;
+    }
   </style>
+  <!-- SockJS + STOMP -->
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
 <div th:replace="~{header.html}"></div>
@@ -86,7 +143,64 @@
     Tổng số câu đúng: <span class="correct" th:text="${totalCorrect}"></span> /
     <span th:text="${totalQuestions}"></span>
   </div>
+
+  <!-- Phần hiển thị thông tin thi đấu nếu có -->
+  <div th:if="${isCompetition}" class="competition-status" id="competitionStatus">
+    <h3>Thông tin thi đấu</h3>
+    <p class="competition-waiting" id="competitionWaiting">Đang chờ đối thủ hoàn thành bài thi...</p>
+    <div id="competitionResult" style="display: none;" class="competition-complete">
+      <p>Kết quả cuộc thi:</p>
+      <p id="resultMessage"></p>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <a th:href="@{/user/toeic-detail/{examId}(examId=${examId})}" class="btn btn-outline">Quay lại thông tin đề thi</a>
+    <a th:href="@{/user/toeic}" class="btn btn-primary">Xem các đề thi khác</a>
+  </div>
 </div>
+
+<script th:inline="javascript">
+  // Connect to WebSocket for competition updates
+  const socket = new SockJS('/ws');
+  const stompClient = Stomp.over(socket);
+  const roomId = /*[[${roomId}]]*/ '';
+  
+  if (roomId) {
+    stompClient.connect({}, function(frame) {
+      // Subscribe to competition updates
+      stompClient.subscribe('/topic/competition/' + roomId, function(message) {
+        const result = JSON.parse(message.body);
+        updateCompetitionStatus(result);
+      });
+    });
+  }
+
+  function updateCompetitionStatus(result) {
+    const waitingElement = document.getElementById('competitionWaiting');
+    const resultElement = document.getElementById('competitionResult');
+    const resultMessage = document.getElementById('resultMessage');
+
+    if (result.completed) {
+      waitingElement.style.display = 'none';
+      resultElement.style.display = 'block';
+
+      let message = 'Kết quả cuộc thi:<br>';
+      message += `Người chơi 1: ${result.user1Score} điểm<br>`;
+      message += `Người chơi 2: ${result.user2Score} điểm<br>`;
+
+      if (result.user1Score > result.user2Score) {
+        message += '<span class="win">Người chơi 1 thắng!</span>';
+      } else if (result.user2Score > result.user1Score) {
+        message += '<span class="lose">Người chơi 2 thắng!</span>';
+      } else {
+        message += '<span class="draw">Hòa!</span>';
+      }
+
+      resultMessage.innerHTML = message;
+    }
+  }
+</script>
 
 <div th:replace="~{footer.html}"></div>
 </body>

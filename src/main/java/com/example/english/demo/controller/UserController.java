@@ -7,11 +7,13 @@ import com.example.english.demo.dto.request.UserUpdateRequest;
 import com.example.english.demo.dto.response.ToeicExamResponse;
 import com.example.english.demo.dto.response.ToeicQuestionResponse;
 import com.example.english.demo.dto.response.UserResponse;
+import com.example.english.demo.entity.CompetitionResult;
 import com.example.english.demo.entity.ToeicExam;
 import com.example.english.demo.entity.ToeicQuestion;
 import com.example.english.demo.entity.User;
 import com.example.english.demo.exception.AppException;
 import com.example.english.demo.exception.ErrorCode;
+import com.example.english.demo.repository.CompetitionResultRepository;
 import com.example.english.demo.repository.ToeicExamRepository;
 import com.example.english.demo.repository.ToeicQuestionRepository;
 import com.example.english.demo.repository.UserRepository;
@@ -42,14 +44,11 @@ public class UserController {
     private final AuthenticationService authenticationService;
     private final UserRepository userRepository;
     private final ToeicExamService toeicExamService;
-
     private final ToeicQuestionService toeicQuestionService;
-
-    private  final ToeicExamRepository toeicExamRepository;
-
+    private final ToeicExamRepository toeicExamRepository;
     private final ToeicQuestionRepository toeicQuestionRepository;
-
-
+    private final CompetitionResultRepository competitionResultRepository;
+    private final CompetitionResultService competitionResultService;
 
     @GetMapping("/create")
     public String createUserPage(Model model) {
@@ -96,7 +95,6 @@ public class UserController {
         return modelAndView;
     }
 
-
     @GetMapping("/toeic")
     public String getToeicExams(@RequestParam(defaultValue = "1") int pageNo, Model model) {
         Page<ToeicExamResponse> listToeicExams = toeicExamService.getToeicExams(pageNo);
@@ -107,7 +105,6 @@ public class UserController {
 
         return "user/toeic";
     }
-
 
     @GetMapping("/getAllUser")
     ApiResponse<List<UserResponse>> getUser(){
@@ -145,11 +142,11 @@ public class UserController {
         return "user/showExamQuestionByPart";
     }
 
-
     @PostMapping("/submit-toeic-exam")
     public String submitToeicExam(
             @RequestParam String examId,
             @RequestParam Map<String, String> answers,
+            @RequestParam(required = false) String roomId,
             Model model) {
 
         Long parsedExamId = Long.parseLong(examId);
@@ -185,14 +182,21 @@ public class UserController {
             partResults.add(result);
         }
 
+        // If this is a competition (roomId is present), save the result
+        if (roomId != null && !roomId.isEmpty()) {
+            String currentUserId = getCurrentUserId(); // You need to implement this method to get the current user's ID
+            competitionResultService.createOrUpdateCompetitionResult(roomId, currentUserId, parsedExamId, totalCorrect);
+        }
+
         model.addAttribute("examId", examId);
         model.addAttribute("partResults", partResults);
         model.addAttribute("totalCorrect", totalCorrect);
         model.addAttribute("totalQuestions", totalQuestions);
+        model.addAttribute("isCompetition", roomId != null && !roomId.isEmpty());
+        model.addAttribute("roomId", roomId);
 
         return "user/toeicExamResult";
     }
-
 
     @GetMapping("/toeic-detail/{examId}")
     public String showToeicDetail(@PathVariable Long examId, Model model) {
@@ -205,15 +209,19 @@ public class UserController {
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
 
+        // Lấy lịch sử thi đấu của người dùng hiện tại với đề thi này
+        List<CompetitionResult> history = competitionResultRepository
+                .findByExam_ExamIdAndUser1_IdOrExam_ExamIdAndUser2_Id(
+                        examId, currentUser.getId(), examId, currentUser.getId());
+
         model.addAttribute("toeicExam", toeicExam);
         model.addAttribute("examId", examId);
         model.addAttribute("currentUserId", currentUser.getId());
         model.addAttribute("currentUsername", currentUser.getUsername());
+        model.addAttribute("competitionHistory", history);
 
         return "user/toeicDetail";
     }
-
-
 
     @GetMapping("/search-users")
     @ResponseBody
@@ -240,7 +248,6 @@ public class UserController {
                 .build();
     }
 
-
     @PutMapping("/{userId}")
     @ResponseBody
     ApiResponse<UserResponse> updateUser(@PathVariable String userId,@RequestBody UserUpdateRequest request){
@@ -264,4 +271,11 @@ public class UserController {
                 .build();
     }
 
+    private String getCurrentUserId() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            return auth.getName();
+        }
+        throw new RuntimeException("User not authenticated");
+    }
 }

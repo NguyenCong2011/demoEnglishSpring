@@ -103,6 +103,48 @@
     </div>
 </div>
 
+<!-- Lịch sử thi đấu -->
+<div style="margin-top: 40px;">
+    <h3>Lịch sử thi đấu của đề này</h3>
+
+    <table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%;">
+        <thead>
+        <tr>
+            <th>Phòng</th>
+            <th>Người chơi 1</th>
+            <th>Điểm</th>
+            <th>Người chơi 2</th>
+            <th>Điểm</th>
+            <th>Kết quả</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="match : ${competitionHistory}">
+            <td th:text="${match.roomId}">Room</td>
+            <td th:text="${match.user1.username}">User 1</td>
+            <td th:text="${match.user1Score}">-</td>
+            <td th:text="${match.user2 != null ? match.user2.username : 'Đang chờ...'}">User 2</td>
+            <td th:text="${match.user2Score != null ? match.user2Score : '-'}">-</td>
+            <td>
+                <span th:if="${match.user2Score == null}">Đang chờ</span>
+
+                <span th:if="${match.user1.id == currentUserId}">
+            <span th:if="${match.user1Score > match.user2Score}">Thắng</span>
+            <span th:if="${match.user1Score == match.user2Score}">Hòa</span>
+            <span th:if="${match.user1Score < match.user2Score}">Thua</span>
+        </span>
+
+                <span th:if="${match.user2 != null and match.user2.id == currentUserId}">
+            <span th:if="${match.user2Score > match.user1Score}">Thắng</span>
+            <span th:if="${match.user2Score == match.user1Score}">Hòa</span>
+            <span th:if="${match.user2Score < match.user1Score}">Thua</span>
+        </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
 <!-- SockJS + STOMP -->
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>

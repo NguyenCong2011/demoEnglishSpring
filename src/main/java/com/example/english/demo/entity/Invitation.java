@@ -13,4 +13,5 @@ public class Invitation {
     private String receiverId;
     private String examId;
     private String examName;
+    private String roomId;
 }
