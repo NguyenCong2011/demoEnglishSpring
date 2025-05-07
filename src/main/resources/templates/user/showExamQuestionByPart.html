@@ -90,6 +90,8 @@
 
     <form method="post" th:action="@{/user/submit-toeic-exam}">
         <input type="hidden" name="examId" th:value="${examId}" />
+        <input type="hidden" name="user1Id" th:value="${user1Id}" />
+        <input type="hidden" name="user2Id" th:value="${user2Id}" />
 
         <div class="question-list">
             <div th:each="question, iter : ${toeicQuestions}"

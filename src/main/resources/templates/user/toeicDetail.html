@@ -118,30 +118,6 @@
             <th>Kết quả</th>
         </tr>
         </thead>
-        <tbody>
-        <tr th:each="match : ${competitionHistory}">
-            <td th:text="${match.roomId}">Room</td>
-            <td th:text="${match.user1.username}">User 1</td>
-            <td th:text="${match.user1Score}">-</td>
-            <td th:text="${match.user2 != null ? match.user2.username : 'Đang chờ...'}">User 2</td>
-            <td th:text="${match.user2Score != null ? match.user2Score : '-'}">-</td>
-            <td>
-                <span th:if="${match.user2Score == null}">Đang chờ</span>
-
-                <span th:if="${match.user1.id == currentUserId}">
-            <span th:if="${match.user1Score > match.user2Score}">Thắng</span>
-            <span th:if="${match.user1Score == match.user2Score}">Hòa</span>
-            <span th:if="${match.user1Score < match.user2Score}">Thua</span>
-        </span>
-
-                <span th:if="${match.user2 != null and match.user2.id == currentUserId}">
-            <span th:if="${match.user2Score > match.user1Score}">Thắng</span>
-            <span th:if="${match.user2Score == match.user1Score}">Hòa</span>
-            <span th:if="${match.user2Score < match.user1Score}">Thua</span>
-        </span>
-            </td>
-        </tr>
-        </tbody>
     </table>
 </div>
 

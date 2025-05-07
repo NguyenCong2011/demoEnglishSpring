@@ -144,16 +144,6 @@
     <span th:text="${totalQuestions}"></span>
   </div>
 
-  <!-- Phần hiển thị thông tin thi đấu nếu có -->
-  <div th:if="${isCompetition}" class="competition-status" id="competitionStatus">
-    <h3>Thông tin thi đấu</h3>
-    <p class="competition-waiting" id="competitionWaiting">Đang chờ đối thủ hoàn thành bài thi...</p>
-    <div id="competitionResult" style="display: none;" class="competition-complete">
-      <p>Kết quả cuộc thi:</p>
-      <p id="resultMessage"></p>
-    </div>
-  </div>
-
   <div class="action-buttons">
     <a th:href="@{/user/toeic-detail/{examId}(examId=${examId})}" class="btn btn-outline">Quay lại thông tin đề thi</a>
     <a th:href="@{/user/toeic}" class="btn btn-primary">Xem các đề thi khác</a>

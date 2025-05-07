@@ -47,14 +47,10 @@ public class InviteController {
         if (user1 != null && user2 != null && exam != null) {
             // Create and save CompetitionResult
             CompetitionResult competitionResult = new CompetitionResult();
-            competitionResult.setRoomId(roomId);
             competitionResult.setUser1(user1);
             competitionResult.setUser2(user2);
-            competitionResult.setExam(exam);
-            competitionResult.setUser1Score(0); // Initialize scores
-            competitionResult.setUser2Score(0); // Initialize scores
+            competitionResult.setExam(exam);// Initialize scores
             competitionResultRepository.save(competitionResult);
-            log.info("Saved CompetitionResult for room {}", roomId);
         } else {
             log.error("Failed to save CompetitionResult: User(s) or Exam not found.");
         }
