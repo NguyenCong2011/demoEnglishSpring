@@ -12,11 +12,11 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class Role {
-    @Id
-    private String name;
-    private String description;
+  @Id
+  private String name;
+  private String description;
 
-    @ManyToMany
-    Set<Permission> permissions;
+  @ManyToMany
+  Set<Permission> permissions;
 }
 

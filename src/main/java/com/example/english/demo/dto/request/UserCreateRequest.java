@@ -1,6 +1,7 @@
 package com.example.english.demo.dto.request;
 
 import com.example.english.demo.validator.DobConstraint;
+import com.example.english.demo.validator.PasswordCheck.PasswordValid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -9,6 +9,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.util.UUID;
+
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -19,10 +21,18 @@ public class InviteController {
     @MessageMapping("/invite")
     public void sendInvite(@Payload InviteMessage message) {
         log.info("Received invite request from {} to {}", message.getSenderId(), message.getReceiverId());
+
+        // ✅ Tạo roomId duy nhất
+        String roomId = UUID.randomUUID().toString();
+        message.setRoomId(roomId); // Gán roomId vào message để cả 2 phía dùng chung
+
         String destination = "/topic/invite/" + message.getReceiverId();
         log.info("Sending invite to destination: {}", destination);
+
+        // ✅ Gửi kèm roomId
         messagingTemplate.convertAndSend(destination, message);
     }
+
 
     @MessageMapping("/accept-invite")
     public void handleAcceptInvite(Invitation invite) {

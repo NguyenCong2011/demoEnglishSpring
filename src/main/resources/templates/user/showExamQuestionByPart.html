@@ -3,66 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>TOEIC Test</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <style>
+            /* Customize Timer */
+            #timer {
+                position: fixed;
+                top: 50px;
+                right: 20px;
+                background-color: #007bff;
+                color: white;
+                padding: 10px 15px;
+                border-radius: 5px;
+                font-size: 20px;
+                z-index: 1000;
+            }
+        </style>
+    </head>
 
-        .content-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+<body class="bg-gray-100">
 
-        .question-item {
-            background-color: #f1f1f1;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-
-        .part-links {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .part-links button {
-            padding: 10px;
-            background-color: #f1f1f1;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .part-links button.active,
-        .part-links button:hover {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        /* Timer CSS */
-        #timer {
-            position: fixed;
-            top: 50px;
-            right: 20px;
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-size: 20px;
-            z-index: 1000;
-        }
-    </style>
-</head>
-<body>
 <!-- Header -->
 <div th:replace="~{header.html}"></div>
 
@@ -70,68 +30,80 @@
 <div id="timer">120:00</div>
 
 <!-- Nội dung bài thi -->
-<div class="content-container">
-    <div class="part-links">
-        <button onclick="filterPart(1)">Part 1</button>
-        <button onclick="filterPart(2)">Part 2</button>
-        <button onclick="filterPart(3)">Part 3</button>
-        <button onclick="filterPart(4)">Part 4</button>
-        <button onclick="filterPart(5)">Part 5</button>
-        <button onclick="filterPart(6)">Part 6</button>
-        <button onclick="filterPart(7)">Part 7</button>
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- Phần chọn đề -->
+    <div class="flex justify-center gap-4 mb-8">
+        <button onclick="filterPart(1)" class="px-6 py-3 bg-gray-200 hover:bg-blue-600 text-gray-800 hover:text-white rounded-lg transition duration-300 transform hover:scale-105">Part 1</button>
+        <button onclick="filterPart(2)" class="px-6 py-3 bg-gray-200 hover:bg-blue-600 text-gray-800 hover:text-white rounded-lg transition duration-300 transform hover:scale-105">Part 2</button>
+        <button onclick="filterPart(3)" class="px-6 py-3 bg-gray-200 hover:bg-blue-600 text-gray-800 hover:text-white rounded-lg transition duration-300 transform hover:scale-105">Part 3</button>
+        <button onclick="filterPart(4)" class="px-6 py-3 bg-gray-200 hover:bg-blue-600 text-gray-800 hover:text-white rounded-lg transition duration-300 transform hover:scale-105">Part 4</button>
+        <button onclick="filterPart(5)" class="px-6 py-3 bg-gray-200 hover:bg-blue-600 text-gray-800 hover:text-white rounded-lg transition duration-300 transform hover:scale-105">Part 5</button>
+        <button onclick="filterPart(6)" class="px-6 py-3 bg-gray-200 hover:bg-blue-600 text-gray-800 hover:text-white rounded-lg transition duration-300 transform hover:scale-105">Part 6</button>
+        <button onclick="filterPart(7)" class="px-6 py-3 bg-gray-200 hover:bg-blue-600 text-gray-800 hover:text-white rounded-lg transition duration-300 transform hover:scale-105">Part 7</button>
     </div>
 
-    <div th:if="${toeicExam.audio != null and !toeicExam.audio.isEmpty()}">
-        <audio controls>
+    <!-- Phần Audio nếu có -->
+    <div th:if="${toeicExam.audio != null and !toeicExam.audio.isEmpty()}" class="mb-8">
+        <audio controls class="w-full max-w-xl mx-auto">
             <source th:src="@{'/audio/' + ${toeicExam.audio}}" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
     </div>
 
-    <form method="post" th:action="@{/user/submit-toeic-exam}">
+    <form method="post" th:action="@{/user/submit-toeic-exam}" class="bg-white p-8 rounded-lg shadow-lg">
         <input type="hidden" name="examId" th:value="${examId}" />
 
-        <div class="question-list">
-            <div th:each="question, iter : ${toeicQuestions}"
-                 th:attr="data-part=${question.part}"
-                 class="question-item">
-                <input type="hidden" name="questionIds" th:value="${question.questionId}" />
+        <div class="space-y-6">
+            <div th:each="question, iter : ${toeicQuestions}" th:attr="data-part=${question.part}">
+                <div class="border p-4 rounded-lg shadow-sm bg-gray-50">
+                    <input type="hidden" name="questionIds" th:value="${question.questionId}" />
 
-                <div th:if="${question.image != null}">
-                    <img th:src="@{${question.image}}" alt="Question Image" style="max-width: 300px;" />
+                    <!-- Question Image -->
+                    <div th:if="${question.image != null}" class="mb-4">
+                        <img th:src="@{${question.image}}" alt="Question Image" class="max-w-full h-auto rounded-lg shadow-md" />
+                    </div>
+
+                    <p class="font-semibold text-lg mb-4">
+                        <span th:text="'Question ' + (${iter.index + 1}) + ' (Part ' + ${question.part} + ')'"></span>:
+                        <span th:text="${question.questionText}"></span>
+                    </p>
+
+                    <!-- Answer Options -->
+                    <div class="space-y-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 1'" class="text-blue-600" />
+                            <span th:text="${question.dapAn1}"></span>
+                        </label>
+
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 2'" class="text-blue-600" />
+                            <span th:text="${question.dapAn2}"></span>
+                        </label>
+
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 3'" class="text-blue-600" />
+                            <span th:text="${question.dapAn3}"></span>
+                        </label>
+
+                        <!-- Only show Answer 4 if not Part 2 -->
+                        <label th:if="${question.part != 2}" class="flex items-center space-x-2">
+                            <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 4'" class="text-blue-600" />
+                            <span th:text="${question.dapAn4}"></span>
+                        </label>
+                    </div>
                 </div>
-
-                <p><strong>Question [[${iter.index + 1}]] (Part [[${question.part}]]):</strong>
-                    <span th:text="${question.questionText}"></span></p>
-
-                <label>
-                    <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 1'" />
-                    <span th:text="${question.dapAn1}"></span>
-                </label><br/>
-
-                <label>
-                    <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 2'" />
-                    <span th:text="${question.dapAn2}"></span>
-                </label><br/>
-
-                <label>
-                    <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 3'" />
-                    <span th:text="${question.dapAn3}"></span>
-                </label><br/>
-
-                <!-- Chỉ hiển thị Answer 4 nếu Part khác 2 -->
-                <label th:if="${question.part != 2}">
-                    <input type="radio" th:name="'answers[' + ${question.questionId} + ']'" th:value="'Answer 4'" />
-                    <span th:text="${question.dapAn4}"></span>
-                </label><br th:if="${question.part != 2}" />
             </div>
         </div>
 
-        <div style="text-align:center; margin-top:20px;">
-            <button type="submit">Nộp bài</button>
+        <!-- Submit Button -->
+        <div class="text-center mt-8">
+            <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">Nộp bài</button>
         </div>
     </form>
 </div>
+
+</body>
 
 <!-- Script -->
 <script>

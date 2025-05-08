@@ -13,4 +13,5 @@ public class InviteMessage {
     private String receiverId;
     private Long examId;
     private String examName;
+    private String roomId;
 }

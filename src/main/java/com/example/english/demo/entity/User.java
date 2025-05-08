@@ -13,23 +13,23 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    private String username;
-    private String password;
-    private String firstName;
-    private String lastName;
-    private LocalDate dob;
-    private String email;
-    private boolean active;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private String id;
+  private String username;
+  private String password;
+  private String firstName;
+  private String lastName;
+  private LocalDate dob;
+  private String email;
+  private boolean active;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_name")
-    )
-    private Set<Role> roles;
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+          name = "user_roles",
+          joinColumns = @JoinColumn(name = "user_id"),
+          inverseJoinColumns = @JoinColumn(name = "role_name")
+  )
+  private Set<Role> roles;
 
 }
