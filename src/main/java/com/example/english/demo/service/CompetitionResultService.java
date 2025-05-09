@@ -27,44 +27,48 @@ public class CompetitionResultService {
 
     @Transactional
     public void createOrUpdateCompetitionResult(Long examId, String user1Id, String user2Id, String userId, int score) {
-        List<CompetitionResult> results = competitionResultRepository.findByExam_ExamIdAndUser1_IdAndUser2_IdOrExam_ExamIdAndUser2_IdAndUser1_Id(
-                examId, user1Id, user2Id,
-                examId, user2Id, user1Id
-        );
+        // Lấy thông tin user và đề thi
+        User user1 = userRepository.findById(user1Id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
+        User user2 = userRepository.findById(user2Id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
+        ToeicExam exam = toeicExamRepository.findById(examId)
+                .orElseThrow(() -> new AppException(ErrorCode.TOEIC_EXAM_NOT_EXITSTED));
+
+        // Tìm bản ghi CompetitionResult gần nhất (mới nhất) chưa đủ điểm
+        List<CompetitionResult> existingResults = competitionResultRepository
+                .findByExam_ExamIdAndUser1_IdAndUser2_IdOrExam_ExamIdAndUser2_IdAndUser1_Id(
+                        examId, user1Id, user2Id,
+                        examId, user2Id, user1Id
+                );
 
         CompetitionResult resultToUpdate = null;
 
-        if (!results.isEmpty()) {
-            if (results.size() > 1) {
-                log.warn("⚠️ Found multiple CompetitionResult entries for examId {} and users {} and {}. Searching for the correct one to update.", examId, user1Id, user2Id);
-            }
-            // Iterate through results to find the specific entry for this user pair
-            for (CompetitionResult res : results) {
-                if ((res.getUser1().getId().equals(user1Id) && res.getUser2().getId().equals(user2Id)) ||
-                    (res.getUser1().getId().equals(user2Id) && res.getUser2().getId().equals(user1Id))) {
-                    resultToUpdate = res;
-                    log.info("✅ Found specific CompetitionResult to update for examId {} and users {} and {}", examId, user1Id, user2Id);
-                    break; // Found the correct one, exit loop
+        for (CompetitionResult result : existingResults) {
+            boolean user1IsNull = result.getUser1Score() == null;
+            boolean user2IsNull = result.getUser2Score() == null;
+
+            if ((result.getUser1().getId().equals(user1Id) && result.getUser2().getId().equals(user2Id)) ||
+                    (result.getUser1().getId().equals(user2Id) && result.getUser2().getId().equals(user1Id))) {
+
+                if ((userId.equals(user1Id) && user1IsNull) || (userId.equals(user2Id) && user2IsNull)) {
+                    resultToUpdate = result;
+                    break;
                 }
             }
         }
 
+        // Nếu không có bản ghi nào phù hợp để cập nhật điểm, tạo mới bản ghi
         if (resultToUpdate == null) {
-             // This case should ideally not happen if CompetitionResult is created when invite is accepted
-            log.warn("⚠️ CompetitionResult not found for examId {} and users {} and {}. Creating a new one.", examId, user1Id, user2Id);
-            User user1 = userRepository.findById(user1Id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
-            User user2 = userRepository.findById(user2Id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
-            ToeicExam exam = toeicExamRepository.findById(examId).orElseThrow(() -> new AppException(ErrorCode.TOEIC_EXAM_NOT_EXITSTED));
-
             resultToUpdate = new CompetitionResult();
             resultToUpdate.setExam(exam);
             resultToUpdate.setUser1(user1);
             resultToUpdate.setUser2(user2);
-            resultToUpdate.setUser1Score(0); // Initialize scores
-            resultToUpdate.setUser2Score(0); // Initialize scores
+            resultToUpdate.setUser1Score(null);
+            resultToUpdate.setUser2Score(null);
         }
 
-
+        // Cập nhật điểm cho người thi
         if (resultToUpdate.getUser1() != null && resultToUpdate.getUser1().getId().equals(userId)) {
             resultToUpdate.setUser1Score(score);
             log.info("✅ Set user1Score = {} for userId {}", score, userId);
@@ -72,18 +76,15 @@ public class CompetitionResultService {
             resultToUpdate.setUser2Score(score);
             log.info("✅ Set user2Score = {} for userId {}", score, userId);
         } else {
-            log.error("❌ User ID {} not matched in CompetitionResult for examId {} and users {} and {}", userId, examId, user1Id, user2Id);
+            log.error("❌ User ID {} not matched in CompetitionResult", userId);
             return;
         }
-        log.info("Before saving: user1Score = {}, user2Score = {}",
-                resultToUpdate.getUser1Score(), resultToUpdate.getUser2Score());
 
+        // Lưu kết quả
         competitionResultRepository.save(resultToUpdate);
-        log.info("💾 Saved CompetitionResult");
+        log.info("💾 Saved CompetitionResult (new or updated)");
 
         competitionResultRepository.flush();
         log.info("✅ Flushed CompetitionResult to database");
-
-        log.info("✅ Finished createOrUpdateCompetitionResult for examId {}, user1 {}, user2 {}", examId, user1Id, user2Id);
     }
 }
