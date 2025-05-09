@@ -1,72 +1,70 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns="http://www.w3.org/1999/xhtml"
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
   <meta charset="UTF-8">
   <title>Header</title>
-  <style>
-    /* Style cho header */
-    .header-container {
-        display: flex; /* Dùng Flexbox để bố trí các phần tử ngang */
-        justify-content: flex-end; /* Căn tất cả các liên kết về bên phải */
-        align-items: center; /* Căn chỉnh các phần tử theo chiều dọc */
-        padding: 10px;
-    }
-
-    /* Style cho các liên kết trong header */
-    .header-container a {
-        color: black;
-        text-decoration: none;
-        margin: 0 5px; /* Khoảng cách giữa các liên kết */
-        font-size: 18px;
-    }
-
-    .header-container a:hover {
-        text-decoration: underline;
-    }
-
-    /* Ô màu xanh cho "Đăng Nhập" */
-    .login-container {
-        background-color: #007BFF; /* Màu xanh */
-        padding: 5px 10px;
-        margin-left: 10px; /* Khoảng cách giữa "Đăng Nhập" và các liên kết khác */
-        border-radius: 20px;
-    }
-
-    .login-container a {
-        color: white;
-        font-size: 18px;
-    }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="header-container">
-  <a href="/about">Giới thiệu</a>
-  <a href="/program">Chương trình học</a>
-  <a href="/online-tests">Đề thi online</a>
-  <a href="/flashcards">Flashcards</a>
-  <a href="/blog">Blog</a>
-  <a href="/activate-account">Kích hoạt tài khoản</a>
+<header>
+  <nav class="bg-white border-b border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
+    <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+      <a th:href="@{/}" class="flex items-center">
+        <img th:src="@{/images/logo.svg}" class="mr-3 h-6 sm:h-9" alt="Logo" />
+      </a>
 
-  <!-- Hiển thị trạng thái người dùng -->
-  <div>
-    <p sec:authorize="isAuthenticated()">✅ User đã đăng nhập</p>
-    <p sec:authorize="!isAuthenticated()">❌ User chưa đăng nhập</p>
-  </div>
+      <div class="flex items-center lg:order-2 space-x-2">
+        <div sec:authorize="isAuthenticated()" class="text-gray-800 dark:text-white">
+          👋 Xin chào <span th:text="${#authentication.name}" class="font-semibold"></span>
+        </div>
+        <a sec:authorize="isAuthenticated()" th:href="@{/auth/logout}"
+           class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800">
+          Đăng xuất
+        </a>
 
-  <div sec:authorize="isAuthenticated()">
-    ✅ Xin chào <span th:text="${#authentication.name}"></span>
-    <a href="/auth/logout">Đăng xuất</a>
-  </div>
+        <a sec:authorize="!isAuthenticated()" th:href="@{/login}"
+           class="text-gray-800 dark:text-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 py-2 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800">
+          Đăng nhập
+        </a>
 
-  <div sec:authorize="!isAuthenticated()">
-    <a class="login-container" th:href="@{/login}">Đăng nhập</a>
-  </div>
+        <a sec:authorize="!isAuthenticated()" th:href="@{/user/create}"
+           class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
+          Đăng ký
+        </a>
 
-  <div sec:authorize="!isAuthenticated()">
-    <a class="login-container" th:href="@{/user/create}">Đăng Ký</a>
-  </div>
-</div>
+        <button data-collapse-toggle="mobile-menu" type="button"
+                class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700"
+                aria-controls="mobile-menu" aria-expanded="false">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+                  d="M3 5a1 1 0 011-1h12a1 1 0 010 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 010 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 010 2H4a1 1 0 01-1-1z"
+                  clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="hidden w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu">
+        <ul class="flex flex-col mt-4 lg:flex-row lg:space-x-8 lg:mt-0 font-medium">
+          <li><a th:href="@{/about}" class="nav-link">Giới thiệu</a></li>
+          <li><a th:href="@{/program}" class="nav-link">Chương trình học</a></li>
+          <li><a th:href="@{/online-tests}" class="nav-link">Đề thi online</a></li>
+          <li><a th:href="@{/flashcards}" class="nav-link">Flashcards</a></li>
+          <li><a th:href="@{/blog}" class="nav-link">Blog</a></li>
+          <li><a th:href="@{/activate-account}" class="nav-link">Kích hoạt tài khoản</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<style>
+  .nav-link {
+      @apply block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50
+      lg:hover:bg-transparent lg:border-0 lg:hover:text-blue-700 lg:p-0
+      dark:text-gray-400 lg:dark:hover:text-white dark:hover:bg-gray-700
+      dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700;
+  }
+</style>
 </body>
 </html>

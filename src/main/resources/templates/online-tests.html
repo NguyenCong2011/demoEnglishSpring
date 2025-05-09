@@ -1,146 +1,71 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Đề thi Online</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
-
-    .content-container1 {
-      max-width: 900px;
-      margin:0;
-      padding: 20px;
-      text-align: left;
-    }
-
-    h2 {
-      font-weight: bold;
-      font-size: 24px;
-      text-align: left;
-    }
-
-    p {
-      font-size: 18px;
-      margin: 10px 0;
-    }
-
-    .search-container {
-      margin-top: 20px;
-      text-align: left;
-    }
-
-    .search-container input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-sizing: border-box;
-    }
-
-    .search-container input[type="text"]::placeholder {
-      color: #bbb;
-    }
-
-    .search-container button {
-      padding: 10px 20px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .search-container button:hover {
-      background-color: #0056b3;
-    }
-
-    .test {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-    }
-
-    .sub-list {
-      margin-top: 20px;
-      margin-left:1px;
-    }
-
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="font-sans bg-gray-50">
+
 <div th:replace="~{header.html}"></div>
-<div class="content-container1">
-  <h2>Thư viện đề thi</h2>
-  <div class="test">
-    <a href="/online-tests"><div>Tất cả</div></a>
-    <a href="/ielts-academic"><div>IELTS Academic</div></a>
-    <a href="/ielts-general"><div>IELTS General</div></a>
-    <!-- Nếu là admin -->
-    <div sec:authorize="hasRole('ADMIN')">
-      <a href="/admin/toeic"><div>TOEIC</div></a>
+
+<main class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
+  <h2 class="text-3xl font-bold mb-6 text-center text-blue-700">📚 Thư viện đề thi</h2>
+
+  <!-- Nhóm đề thi tiếng Anh -->
+  <section class="mb-8">
+    <h3 class="text-xl font-semibold mb-4 text-gray-700">Đề thi tiếng Anh</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <a href="/online-tests" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center">Tất cả</a>
+      <a href="/ielts-academic" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center">IELTS Academic</a>
+      <a href="/ielts-general" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center">IELTS General</a>
+
+      <!-- Nếu là admin -->
+      <div sec:authorize="hasRole('ADMIN')">
+        <a href="/admin/toeic" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center">TOEIC</a>
+      </div>
+      <!-- Nếu không phải admin -->
+      <div sec:authorize="!hasRole('ADMIN')">
+        <a href="/user/toeic" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 text-center">TOEIC</a>
+      </div>
     </div>
-    <!-- Nếu không phải admin -->
-    <div sec:authorize="!hasRole('ADMIN')">
-      <a href="/user/toeic"><div>TOEIC</div></a>
+  </section>
+
+  <!-- Nhóm đề thi tiếng Trung -->
+  <section class="mb-8">
+    <h3 class="text-xl font-semibold mb-4 text-gray-700">Đề thi HSK (Tiếng Trung)</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <a href="/hsk-1" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 text-center">HSK 1</a>
+      <a href="/hsk-2" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 text-center">HSK 2</a>
+      <a href="/hsk-3" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 text-center">HSK 3</a>
+      <a href="/hsk-4" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 text-center">HSK 4</a>
+      <a href="/hsk-5" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 text-center">HSK 5</a>
+      <a href="/hsk-6" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 text-center">HSK 6</a>
     </div>
+  </section>
 
-    <a href="/hsk-1"><div>HSK 1</div></a>
-    <a href="/hsk-2"><div>HSK 2</div></a>
-    <a href="/hsk-3"><div>HSK 3</div></a>
-    <a href="/hsk-4"><div>HSK 4</div></a>
-    <a href="/hsk-5"><div>HSK 5</div></a>
-  </div>
+  <!-- Nhóm đề thi tiếng Hàn -->
+  <section class="mb-8">
+    <h3 class="text-xl font-semibold mb-4 text-gray-700">Đề thi TOPIK (Tiếng Hàn)</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <a href="/topik-i" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 text-center">TOPIK I</a>
+      <a href="/topik-ii" class="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 text-center">TOPIK II</a>
+    </div>
+  </section>
 
-  <div class="test">
-    <a href="/hsk-6"><div>HSK 6</div></a>
-    <a href="/topik-i"><div>TOPIK I</div></a>
-    <a href="/topik-ii"><div>TOPIK II</div></a>
-    <a href="/toan-thptqg"><div>Toán THPTQG</div></a>
-    <a href="/tieng-anh-thptqg"><div>Tiếng Anh THPTQG</div></a>
-    <a href="/sinh-hoc-thptqg"><div>Sinh học THPTQG</div></a>
-  </div>
+  <!-- Nhóm đề thi THPT Quốc Gia -->
+  <section>
+    <h3 class="text-xl font-semibold mb-4 text-gray-700">Đề thi THPT Quốc Gia</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <a href="/toan-thptqg" class="bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 text-center">Toán</a>
+      <a href="/tieng-anh-thptqg" class="bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 text-center">Tiếng Anh</a>
+      <a href="/sinh-hoc-thptqg" class="bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 text-center">Sinh học</a>
+      <a href="/hoa-hoc-thptqg" class="bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 text-center">Hóa học</a>
+      <a href="/vat-ly-thptqg" class="bg-purple-500 text-white py-2 px-4 rounded hover:bg-purple-600 text-center">Vật lý</a>
+    </div>
+  </section>
+</main>
 
-  <div class="test">
-    <a href="/hoa-hoc-thptqg"><div>Hóa học THPTQG</div></a>
-    <a href="/vat-ly-thptqg"><div>Vật lý THPTQG</div></a>
-    <a href="/new-sat"><div>NEW SAT</div></a>
-    <a href="/act"><div>ACT</div></a>
-  </div>
-
-  <!-- Lùi 1 chút và thêm ô tìm kiếm -->
-  <div class="sub-list">
-    <input type="text" id="search" placeholder="Nhập từ khoá bạn muốn tìm kiếm: tên sách, dạng câu hỏi ...">
-    <button onclick="searchTest()">Tìm kiếm</button>
-  </div>
-
-  <!-- Kết quả tìm kiếm -->
-  <div id="search-results"></div>
-</div>
-
-<script>
-  // JavaScript cho việc tìm kiếm (chưa kết nối với backend, chỉ là ví dụ)
-  function searchTest() {
-    var query = document.getElementById("search").value;
-    var resultDiv = document.getElementById("search-results");
-
-    if (query.length > 0) {
-      resultDiv.innerHTML = "<p>Kết quả tìm kiếm cho: <strong>" + query + "</strong></p>";
-      // Ở đây bạn có thể kết nối đến server để tìm kiếm theo từ khóa
-      // và trả về kết quả, nhưng ở đây chỉ hiển thị ví dụ đơn giản.
-    } else {
-      resultDiv.innerHTML = "<p>Vui lòng nhập từ khóa để tìm kiếm.</p>";
-    }
-  }
-</script>
-<div th:replace="~{footer.html}"></div>
 </body>
 </html>

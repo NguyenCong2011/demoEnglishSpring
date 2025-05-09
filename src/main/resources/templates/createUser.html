@@ -1,26 +1,65 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Create User</title>
+    <meta charset="UTF-8">
+    <title>Tạo Tài Khoản</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Flowbite -->
+    <link href="https://unpkg.com/flowbite@1.6.5/dist/flowbite.min.css" rel="stylesheet" />
+    <script src="https://unpkg.com/flowbite@1.6.5/dist/flowbite.min.js"></script>
 </head>
-<body>
-    <h1>Create New User</h1>
-    <form action="/user/create" method="post">
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required/>
+<body class="bg-gray-50 dark:bg-gray-900">
+
+<section class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+    <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+        <img class="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo">
+        Tạo tài Khoản Người Dùng
+    </a>
+    <div class="w-full bg-white rounded-lg shadow dark:border sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                Create New User
+            </h1>
+            <form th:action="@{/user/create}" method="post" class="space-y-4 md:space-y-6">
+                <!-- Username -->
+                <div>
+                    <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                    <input type="text" id="username" name="username"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                           required placeholder="Enter username">
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+                    <input type="password" id="password" name="password"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                           required placeholder="Enter password">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+                    <input type="email" id="email" name="email"
+                           class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                           required placeholder="Enter email">
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                        class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Create User
+                </button>
+            </form>
+
+            <!-- Success or Error Message -->
+            <p th:if="${message}" th:text="${message}" class="text-sm text-green-500 font-medium"></p>
+            <p th:if="${error}" th:text="${error}" class="text-sm text-red-500 font-medium"></p>
         </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required/>
-        </div>
-        <div>
-            <label>Email:</label>
-            <input type="email" name="email" required/>
-        </div>
-        <button type="submit">Create User</button>
-    </form>
-    <p th:if="${message}" th:text="${message}" style="color: green;"></p>
-    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    </div>
+</section>
+
 </body>
 </html>
