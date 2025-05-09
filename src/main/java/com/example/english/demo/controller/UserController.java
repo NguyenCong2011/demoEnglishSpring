@@ -199,7 +199,9 @@ public class UserController {
         // Nếu là thi đấu thì xử lý lưu điểm và gửi kết quả nếu cả 2 đã nộp bài
         if (user1Id != null && !user1Id.isEmpty() && user2Id != null && !user2Id.isEmpty()) {
             String currentUserId = getCurrentUserId(); // Lấy ID người hiện tại
+            log.info("Calling competitionResultService.createOrUpdateCompetitionResult for examId {} and users {} and {}", parsedExamId, user1Id, user2Id);
             competitionResultService.createOrUpdateCompetitionResult(parsedExamId, user1Id, user2Id, currentUserId, totalCorrect);
+            log.info("Finished calling competitionResultService.createOrUpdateCompetitionResult for examId {} and users {} and {}", parsedExamId, user1Id, user2Id);
 
             List<CompetitionResult> updatedCompetitionResults = competitionResultRepository.findByExam_ExamIdAndUser1_IdAndUser2_IdOrExam_ExamIdAndUser2_IdAndUser1_Id(
                     parsedExamId, user1Id, user2Id,

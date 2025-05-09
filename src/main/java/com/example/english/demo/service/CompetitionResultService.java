@@ -75,8 +75,15 @@ public class CompetitionResultService {
             log.error("❌ User ID {} not matched in CompetitionResult for examId {} and users {} and {}", userId, examId, user1Id, user2Id);
             return;
         }
+        log.info("Before saving: user1Score = {}, user2Score = {}",
+                resultToUpdate.getUser1Score(), resultToUpdate.getUser2Score());
 
         competitionResultRepository.save(resultToUpdate);
-        log.info("💾 Saved CompetitionResult for examId {} and users {} and {}", examId, user1Id, user2Id);
+        log.info("💾 Saved CompetitionResult");
+
+        competitionResultRepository.flush();
+        log.info("✅ Flushed CompetitionResult to database");
+
+        log.info("✅ Finished createOrUpdateCompetitionResult for examId {}, user1 {}, user2 {}", examId, user1Id, user2Id);
     }
 }
