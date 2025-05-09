@@ -142,7 +142,34 @@
     <div class="question-list">
         <div th:each="toeicQuestion : ${toeicQuestions}">
             <div class="question-item">
-                <img th:src="@{${toeicQuestion.image}}" alt="Image" style="max-width: 300px;" />
+                <!-- Form upload ảnh -->
+                <form th:action="@{/admin/update-question-image/{questionId}(questionId=${toeicQuestion.questionId})}"
+                      method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="examId" th:value="${examId}" />
+                    <input type="hidden" name="part" th:value="${part}" />
+
+                    <div>
+                        <label>Image:</label>
+                        <input type="file"
+                               th:id="'image_' + ${toeicQuestion.questionId}"
+                               name="imageFile"
+                               accept="image/*"
+                               th:attr="onchange='previewImage(event,' + ${toeicQuestion.questionId} + ')'" />
+                    </div>
+                    <div>
+                        <img th:id="'thumbnail_' + ${toeicQuestion.questionId}"
+                             th:if="${toeicQuestion.image != null and !toeicQuestion.image.isEmpty()}"
+                             th:src="@{${toeicQuestion.image}}"
+                             alt="Preview"
+                             style="max-width: 300px; margin-top: 10px;" />
+                        <img th:id="'thumbnail_' + ${toeicQuestion.questionId}"
+                             th:if="${toeicQuestion.image == null or toeicQuestion.image.isEmpty()}"
+                             alt="Preview"
+                             style="max-width: 300px; margin-top: 10px;" />
+                    </div>
+                    <button type="submit">Save</button>
+                </form>
+
                 <p><strong>Question:</strong> <span th:text="${toeicQuestion.questionText}"></span></p>
                 <p><strong>Answer 1:</strong> <span th:text="${toeicQuestion.dapAn1}"></span></p>
                 <p><strong>Answer 2:</strong> <span th:text="${toeicQuestion.dapAn2}"></span></p>
@@ -165,6 +192,21 @@
             }, 600);
         }
     });
+
+    function previewImage(event, id) {
+        const input = event.target;
+        const preview = document.getElementById('thumbnail_' + id);
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.src = '';
+        }
+    }
 </script>
 </body>
 </html>

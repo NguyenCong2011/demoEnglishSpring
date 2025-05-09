@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.messaging.simp.SimpMessagingTemplate; // Import SimpMessagingTemplate
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -273,43 +275,25 @@ public class UserController {
         ToeicExam toeicExam = toeicExamRepository.findById(examId)
                 .orElseThrow(() -> new AppException(ErrorCode.TOEIC_EXAM_NOT_EXITSTED));
 
-        // Lấy thông tin người dùng đang đăng nhập
         var auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
 
-        // Lấy lịch sử thi đấu của người dùng hiện tại với đề thi này
-        // Need to find competition results where the current user is either user1 or user2
-        List<CompetitionResult> history = new ArrayList<>();
-        List<CompetitionResult> results = competitionResultRepository
-                .findByExam_ExamIdAndUser1_IdAndUser2_IdOrExam_ExamIdAndUser2_IdAndUser1_Id(
-                        examId, currentUser.getId(), null, // Search for current user as user1
-                        examId, null, currentUser.getId()  // Search for current user as user2
-                );
-
-        // This repository method is designed for finding a specific competition between two users.
-        // To get history for a user in any competition for this exam, a different repository method is needed.
-        // Let's add a new method to the repository to find results by exam and one user ID.
-        // For now, I will handle the List return type to fix the compilation error,
-        // but acknowledge that a new repository method is needed for proper history fetching.
-        if (!results.isEmpty()) {
-             // For now, just add all results found to history. This is not the correct history logic.
-             history.addAll(results);
-             if (results.size() > 1) {
-                 log.warn("⚠️ Found multiple CompetitionResult entries for examId {} and user {}. History fetching needs a dedicated repository method.", examId, currentUser.getId());
-             }
-        }
-
+        // Lấy lịch sử người dùng thi với đề này (ở vị trí user1 hoặc user2)
+        List<CompetitionResult> history = competitionResultRepository.findByExamAndUser(examId, currentUser.getId());
 
         model.addAttribute("toeicExam", toeicExam);
         model.addAttribute("examId", examId);
         model.addAttribute("currentUserId", currentUser.getId());
         model.addAttribute("currentUsername", currentUser.getUsername());
-        model.addAttribute("competitionHistory", history); // History finding needs to be fixed properly
+        model.addAttribute("competitionHistory", history);
 
         return "user/toeicDetail";
     }
+
+
+
 
     @GetMapping("/search-users")
     @ResponseBody

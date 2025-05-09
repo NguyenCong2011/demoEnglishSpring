@@ -18,5 +18,5 @@ public class ToeicQuestionUpdateRequest {
     private String dapAn3;
     private String dapAn4;
     private String correctAnswer;
-    private Integer part;
+    private String image;
 }

@@ -1,9 +1,6 @@
 package com.example.english.demo.controller;
 
-import com.example.english.demo.dto.request.ApiResponse;
-import com.example.english.demo.dto.request.AuthenticationRequest;
-import com.example.english.demo.dto.request.ToeicExamCreateRequest;
-import com.example.english.demo.dto.request.ToeicQuestionCreateRequest;
+import com.example.english.demo.dto.request.*;
 import com.example.english.demo.dto.response.ToeicExamResponse;
 import com.example.english.demo.dto.response.ToeicQuestionResponse;
 import com.example.english.demo.entity.ToeicExam;
@@ -23,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -186,5 +184,19 @@ public class AdminController {
         }
     }
 
+
+    @PostMapping("/update-question-image/{questionId}")
+    public String updateQuestionImage(@PathVariable Long questionId,
+                                      @RequestParam("imageFile") MultipartFile imageFile,
+                                      @RequestParam("examId") Long examId,
+                                      @RequestParam("part") Integer part,
+                                      RedirectAttributes redirectAttributes) {
+        try {
+            toeicQuestionService.updateToeicQuestion(questionId, new ToeicQuestionUpdateRequest(), imageFile);
+        } catch (AppException e) {
+            redirectAttributes.addFlashAttribute("error", e.getErrorCode().getMessage());
+        }
+        return "redirect:/admin/show-toeic-question/" + examId + "?part=" + part;
+    }
 
 }

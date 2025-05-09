@@ -94,13 +94,37 @@ public class ToeicQuestionService {
         return responses;
     }
 
-   public ToeicQuestionResponse updateToeicQuestion(Long questionId, ToeicQuestionUpdateRequest request){
-       ToeicQuestion toeicQuestion=toeicQuestionRepository.findById(questionId)
-               .orElseThrow(()->new RuntimeException("Question not found"));
-       toeicQuestionMapper.updateToeicQuestion(toeicQuestion,request);
-       ToeicQuestion updatedToeicQuestion = toeicQuestionRepository.save(toeicQuestion);
-       return toeicQuestionMapper.toToeicQuestionResponse(updatedToeicQuestion);
-   }
+    public ToeicQuestionResponse updateToeicQuestion(Long questionId, ToeicQuestionUpdateRequest request, MultipartFile imageFile) {
+        ToeicQuestion toeicQuestion = toeicQuestionRepository.findById(questionId)
+                .orElseThrow(() -> new AppException(ErrorCode.TOEIC_QUESTION_NOT_EXITSTED));
+
+        toeicQuestionMapper.updateToeicQuestion(toeicQuestion, request);
+
+        if ((toeicQuestion.getImage() == null || toeicQuestion.getImage().isEmpty())
+                && imageFile != null && !imageFile.isEmpty()) {
+            try {
+                Long examId = toeicQuestion.getToeicExam().getExamId();
+                String examFolderPath = "C:/Users/DELL/Downloads/demoEnglishSpringBoot/src/main/resources/static/images/toeicTest" + examId;
+                Path examFolder = Paths.get(examFolderPath);
+                if (!Files.exists(examFolder)) {
+                    Files.createDirectories(examFolder);
+                }
+
+                String originalImageName = imageFile.getOriginalFilename();
+                String imageName = System.currentTimeMillis() + "_" + originalImageName.replaceAll(" ", "_");
+                Path imagePath = examFolder.resolve(imageName);
+                Files.copy(imageFile.getInputStream(), imagePath);
+
+                toeicQuestion.setImage("/images/toeicTest" + examId + "/" + imageName);
+            } catch (IOException e) {
+                throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
+            }
+        }
+
+        ToeicQuestion updatedToeicQuestion = toeicQuestionRepository.save(toeicQuestion);
+        return toeicQuestionMapper.toToeicQuestionResponse(updatedToeicQuestion);
+    }
+
 
 
     public List<ToeicQuestionResponse> getToeicQuestionsByPart(Long examId, Integer part) {
@@ -180,6 +204,5 @@ public class ToeicQuestionService {
                 .map(toeicQuestionMapper::toToeicQuestionResponse)
                 .collect(Collectors.toList());
     }
-
 
 }

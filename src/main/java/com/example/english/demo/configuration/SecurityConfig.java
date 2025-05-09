@@ -1,8 +1,6 @@
 package com.example.english.demo.configuration;
 
 //file này chứa các bean để inject
-
-import com.example.english.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    String[] publicRoutes = {"/ws/**", "/topic/**","/app/invite","/app/accept-invite","/app/reject-invite", "/topic/invite/{userId}","/user/search-users","/user/toeic-detail/{examId}","/competition","/user/friends","/user/submit-toeic-exam","/user/show-toeic-question/{examId}","/admin/login","/user/toeic","/audio/**","/user/confirm-account/**","/admin/import-toeic-questions/{examId}","/images/**","/admin/show-toeic-question/{examId}","/admin/create-toeic-question/{examId}","/user/create","/auth/login","/login","/toeic","/online-tests","/","/admin/toeic","/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create","/toeic-exam/update/{examId}","/admin/create-toeic-exam"};
+    String[] publicRoutes = {"/ws/**", "/topic/**","/app/invite","/app/accept-invite","/app/reject-invite", "/topic/invite/{userId}","/user/search-users","/user/toeic-detail/{examId}","/admin/update-question-image/{questionId}","/competition","/user/friends","/user/submit-toeic-exam","/user/show-toeic-question/{examId}","/admin/login","/user/toeic","/audio/**","/user/confirm-account/**","/admin/import-toeic-questions/{examId}","/images/**","/admin/show-toeic-question/{examId}","/admin/create-toeic-question/{examId}","/user/create","/auth/login","/login","/toeic","/online-tests","/","/admin/toeic","/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create","/toeic-exam/update/{examId}","/admin/create-toeic-exam"};
 
     //@Value("${signer.key}")
     //private String Signer_Key;
