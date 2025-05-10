@@ -63,6 +63,22 @@
             border: 1px solid #000;
             padding: 10px;
         }
+        .btn-invite {
+            background-color: #17a2b8; /* Màu xanh ngọc */
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-invite:hover {
+            background-color: #138496;
+        }
+
     </style>
 </head>
 <body>
@@ -259,7 +275,7 @@
 
                 let html = "<ul>";
                 data.result.forEach(user => {
-                    html += `<li>${user.username} <button onclick="inviteUser('${user.id}')">Invite</button></li>`;
+                    html += `<li>${user.username} <button class="btn-invite" onclick="inviteUser('${user.id}')">Invite</button></li>`;
                 });
                 html += "</ul>";
                 resultDiv.innerHTML = html;
