@@ -4,6 +4,7 @@ package com.example.english.demo.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableMethodSecurity
 @Configuration
@@ -42,6 +44,35 @@ public class SecurityConfig {
 
         return httpSecurity.build();
     }
+
+//    hàm này học trên mạng về phân quyền
+//    @Bean
+//    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//
+//        http
+//                .authorizeHttpRequests(authConfig -> {
+//                    authConfig.requestMatchers(HttpMethod.GET, "/", "/login", "/error", "/login-error", "/logout", "/css/**").permitAll();
+//                    authConfig.requestMatchers(HttpMethod.GET, "/user").hasRole("USER");
+//                    authConfig.requestMatchers(HttpMethod.GET, "/admin").hasRole("ADMIN");
+//                    authConfig.requestMatchers(HttpMethod.GET, "/developer").hasRole("DEVELOPER");
+//                    authConfig.requestMatchers(HttpMethod.GET, "/users").hasAnyRole("DEVELOPER");
+//                    authConfig.requestMatchers(HttpMethod.GET, "/authorities").hasAnyRole("DEVELOPER");
+//                    authConfig.anyRequest().authenticated();
+//                })
+//                .formLogin(login -> {
+//                            login.loginPage("/login");
+//                            login.defaultSuccessUrl("/");
+//                            login.failureUrl("/login-error");
+//                        }
+//                )
+//                .logout(logout -> {
+//                    logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
+//                    logout.logoutSuccessUrl("/");
+//                    logout.deleteCookies("JSESSIONID");
+//                    logout.invalidateHttpSession(true);
+//                });
+//        return http.build();
+//    }
 
     //override Bean Granted là giả dụ và giả dụ xong phải authen và nó bắt buộc phải có là admin thì mới được truy cập k cả có token hợp le
     @Bean
