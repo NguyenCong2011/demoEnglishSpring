@@ -186,6 +186,38 @@
         startTimer(timeLimit, display);
     };
 </script>
+<script th:if="${#authorization.expression('isAuthenticated()')}">
+    function getJwtFromCookie() {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; jwt=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    function refreshToken() {
+        const token = getJwtFromCookie();
+        if (!token) return;
+
+        fetch('/auth/refesh-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Không làm mới được token");
+            return res.json();
+        })
+        .then(data => {
+            document.cookie = `jwt=${data.result.token}; path=/`;
+            console.log("✅ Token đã được làm mới");
+        })
+        .catch(err => {
+            console.warn("❌ Refresh token lỗi:", err);
+        });
+    }
+
+    // Gọi refresh token mỗi 13 phút
+    setInterval(refreshToken, 13 * 60 * 1000);
+</script>
 
 <!-- Footer -->
 <div th:replace="~{footer.html}"></div>
