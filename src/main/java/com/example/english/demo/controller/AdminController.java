@@ -1,6 +1,7 @@
 package com.example.english.demo.controller;
 
 import com.example.english.demo.dto.request.*;
+import com.example.english.demo.dto.response.CourseResponseDTO;
 import com.example.english.demo.dto.response.ToeicExamResponse;
 import com.example.english.demo.dto.response.ToeicQuestionResponse;
 import com.example.english.demo.entity.ToeicExam;
@@ -43,9 +44,16 @@ public class AdminController {
 
     private final UserRepository userRepository;
 
+    private final CourseService courseService;
+
     @GetMapping("/login")
     public String showAdminLoginPage() {
         return "admin/login";
+    }
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("name", "John");
+        return "admin/home";
     }
 
     @PostMapping("/login")
@@ -198,5 +206,24 @@ public class AdminController {
         }
         return "redirect:/admin/show-toeic-question/" + examId + "?part=" + part;
     }
+
+    @GetMapping("/createCourse")
+    public String showCreateCourseForm(Model model) {
+        model.addAttribute("courseRequestDTO", new CourseRequestDTO());
+        return "admin/createCourse";
+    }
+
+    @PostMapping("/createCourse")
+    public String createCourse(@ModelAttribute @Valid CourseRequestDTO courseRequestDTO,
+                               Model model) {
+        try {
+            CourseResponseDTO response = courseService.createCourse(courseRequestDTO);
+            return "redirect:/";
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to create course");
+            return "admin/createCourse";
+        }
+    }
+
 
 }

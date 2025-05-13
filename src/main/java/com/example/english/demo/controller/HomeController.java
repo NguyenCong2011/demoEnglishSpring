@@ -35,7 +35,6 @@ public class HomeController {
         return "login";
     }
 
-
     @PostMapping("/login")
     public String authenticate(@ModelAttribute @Valid AuthenticationRequest request,
                                HttpServletResponse response,

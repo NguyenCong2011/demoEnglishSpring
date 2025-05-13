@@ -32,4 +32,7 @@ public class User {
     )
     private Set<Role> roles;
 
+    @ManyToMany(mappedBy = "students")
+    private Set<Course> courses;
+
 }
