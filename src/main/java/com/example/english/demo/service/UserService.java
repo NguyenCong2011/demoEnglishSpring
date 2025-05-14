@@ -115,7 +115,7 @@ public class UserService {
         }
 
         String username = authentication.getName();
-        return userRepository.findByEmail(username);
+        return userRepository.findByUsername(username).orElse(null);
     }
 
 }

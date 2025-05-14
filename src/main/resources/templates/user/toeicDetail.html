@@ -136,17 +136,17 @@
     <table>
         <thead>
         <tr>
-            <th>Người chơi 1</th>
-            <th>Điểm Người chơi 1</th>
-            <th>Người chơi 2</th>
-            <th>Điểm Người chơi 2</th>
+            <th>Người thi 1</th>
+            <th>Điểm người thi 1</th>
+            <th>Người thi 2</th>
+            <th>Điểm người thi 2</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="result : ${competitionHistory}">
-            <td th:text="${result.user1.username}">Tên người chơi 1</td>
+            <td th:text="${result.user1.username}">Tên người thi 1</td>
             <td th:text="${result.user1Score}">Điểm 1</td>
-            <td th:text="${result.user2.username}">Tên người chơi 2</td>
+            <td th:text="${result.user2.username}">Tên người thi 2</td>
             <td th:text="${result.user2Score}">Điểm 2</td>
         </tr>
         </tbody>
