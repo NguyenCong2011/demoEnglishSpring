@@ -72,7 +72,7 @@ public class VNPayController {
     }
 
 
-    @GetMapping("/payment-return")
+    @GetMapping("/payment-callback")
     public ResponseEntity<String> paymentReturn(HttpServletRequest request) {
         Map<String, String> params = new HashMap<>();
         request.getParameterMap().forEach((key, values) -> params.put(key, values[0]));

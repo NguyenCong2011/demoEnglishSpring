@@ -4,7 +4,10 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.io.UnsupportedEncodingException;
 
 public class VNPayUtil {
 
@@ -60,10 +63,20 @@ public class VNPayUtil {
             String fieldName = fieldNames.get(i);
             String fieldValue = fields.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                sb.append(fieldName).append("=").append(fieldValue);
-                if (i < fieldNames.size() - 1) sb.append("&");
+                try {
+                    // URL encode the field value before appending
+                    String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString());
+                    sb.append(fieldName).append("=").append(encodedValue);
+                    if (i < fieldNames.size() - 1) sb.append("&");
+                } catch (UnsupportedEncodingException e) {
+                    // Handle the exception, perhaps log it or return an empty string
+                    e.printStackTrace(); // Or use a logger
+                    return ""; // Return empty string on encoding failure
+                }
             }
         }
-        return hmacSHA512(secretKey, sb.toString());
+        String dataForHashing = sb.toString();
+        System.out.println("Data for hashing: " + dataForHashing);
+        return hmacSHA512(secretKey, dataForHashing);
     }
 }
