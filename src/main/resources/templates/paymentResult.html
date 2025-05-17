@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kết quả thanh toán</title>
+</head>
+<body>
+<div class="container mx-auto text-center mt-20">
+    <div th:switch="${status}">
+        <h1 th:case="'success'" class="text-2xl text-green-600 font-bold">🎉 Thanh toán thành công!</h1>
+        <h1 th:case="'fail'" class="text-2xl text-red-600 font-bold">❌ Thanh toán thất bại!</h1>
+        <h1 th:case="'invalid'" class="text-2xl text-yellow-600 font-bold">⚠️ Dữ liệu không hợp lệ!</h1>
+    </div>
+
+    <a href="/course/list" class="mt-6 inline-block text-blue-500 hover:underline">Quay lại danh sách khóa học</a>
+</div>
+</body>
+</html>
