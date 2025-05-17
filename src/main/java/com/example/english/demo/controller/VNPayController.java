@@ -155,7 +155,7 @@ public class VNPayController {
                                 // Tạo request DTO
                                 CoursePaymentRequest requestDto = new CoursePaymentRequest();
                                 requestDto.setOrder(params.get("vnp_TxnRef"));
-                                requestDto.setAmount(Float.parseFloat(params.get("vnp_Amount")) / 100);
+                                requestDto.setAmount(course.getPrice().floatValue()); // Lấy amount từ giá khóa học
                                 requestDto.setSuccess(true);
                                 requestDto.setCreatedAt(LocalDateTime.now());
                                 requestDto.setCourse(course);
