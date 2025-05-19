@@ -15,9 +15,7 @@ public class CoursePayment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private String orderId; // Mã giao dịch duy nhất với VNPay
     private Float amount;
-    private Boolean success;
     private LocalDateTime createdAt;
 
     @ManyToOne

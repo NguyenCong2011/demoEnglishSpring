@@ -8,9 +8,7 @@ import java.time.LocalDateTime;
 
 public class CoursePaymentResponse {
     private Integer id;
-    private String order;
     private Float amount;
-    private Boolean success;
     private LocalDateTime createdAt;
     private User user;
     private Course course;

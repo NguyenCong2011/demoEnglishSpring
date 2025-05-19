@@ -17,9 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CoursePaymentRequest {
     private Integer id;
-    private String order;
     private Float amount;
-    private Boolean success;
     private LocalDateTime createdAt;
     private User user;
     private Course course;
