@@ -19,4 +19,5 @@ public class ToeicQuestionUpdateRequest {
 //    private String dapAn4;
 //    private String correctAnswer;
     private String image;
+    private Boolean isCloudinary = false;
 }

@@ -1,5 +1,6 @@
 package com.example.english.demo.service;
 
+import com.example.english.demo.configuration.CloudinaryConfig;
 import com.example.english.demo.dto.request.ToeicQuestionCreateRequest;
 import com.example.english.demo.dto.request.ToeicQuestionUpdateRequest;
 import com.example.english.demo.dto.response.ToeicQuestionResponse;
@@ -38,61 +39,57 @@ public class ToeicQuestionService {
    private final ToeicQuestionRepository toeicQuestionRepository;
    private final ToeicExamRepository toeicExamRepository;
 
+   private final CloudinaryService cloudinaryService;
+
    @Value("${upload.path}") // Đọc thư mục lưu trữ ảnh từ application.properties
    private String uploadDir;
 
 //    muốn nhận vào list thì phải có cái gọi là sửa thành 1 hàm list
-    public List<ToeicQuestionResponse> createToeicQuestions(List<ToeicQuestionCreateRequest> toeicQuestionCreateRequests, Long examId, MultipartFile[] images) {
-        ToeicExam toeicExam = toeicExamRepository.findById(examId)
+    public List<ToeicQuestionResponse> createToeicQuestions(List<ToeicQuestionCreateRequest> requests,
+                                                            Long examId,
+                                                            MultipartFile[] images) {
+        ToeicExam exam = toeicExamRepository.findById(examId)
                 .orElseThrow(() -> new AppException(ErrorCode.TOEIC_EXAM_NOT_EXITSTED));
         List<ToeicQuestionResponse> responses = new ArrayList<>();
 
-        for (ToeicQuestionCreateRequest toeicQuestionCreateRequest : toeicQuestionCreateRequests) {
-            if (toeicQuestionRepository.existsByQuestionTextAndCorrectAnswerAndToeicExam_ExamId(
-                    toeicQuestionCreateRequest.getQuestionText(),
-                    toeicQuestionCreateRequest.getCorrectAnswer(),
-                    examId)) {
-                throw new AppException(ErrorCode.TOEIC_QUESTION_EXITSTED);
-            }
-        }
+        for (int i = 0; i < requests.size(); i++) {
+            ToeicQuestionCreateRequest req = requests.get(i);
+            ToeicQuestion question = toeicQuestionMapper.toToeicQuestion(req);
+            question.setToeicExam(exam);
 
-        // Tạo câu hỏi và lưu ảnh
-        for (int i = 0; i < toeicQuestionCreateRequests.size(); i++) {
-            ToeicQuestionCreateRequest toeicQuestionCreateRequest = toeicQuestionCreateRequests.get(i);
-            ToeicQuestion toeicQuestion = toeicQuestionMapper.toToeicQuestion(toeicQuestionCreateRequest);
-            toeicQuestion.setToeicExam(toeicExam);
-
-            // Nếu có ảnh, lưu ảnh và lưu đường dẫn ảnh vào cơ sở dữ liệu
-            if (images != null && images.length > i) {
-                MultipartFile image = images[i]; // Lấy ảnh theo thứ tự từ danh sách
-
+            if (images != null && images.length > i && !images[i].isEmpty()) {
+                MultipartFile image = images[i];
                 try {
-                    // Tạo thư mục cho examId nếu chưa tồn tại
-                    String examFolderPath = "C:/Users/DELL/Downloads/demoEnglishSpringBoot/src/main/resources/static/images/toeicTest" + examId;
-                    Path examFolder = Paths.get(examFolderPath);
-                    if (!Files.exists(examFolder)) {
-                        Files.createDirectories(examFolder); // Tạo thư mục nếu chưa có
-                    }
-                    // Lưu ảnh vào thư mục theo examId
-                    String originalImageName = image.getOriginalFilename();
-                    String imageName = System.currentTimeMillis() + "_" + originalImageName.replaceAll(" ", "_"); // Thay dấu cách bằng dấu gạch dưới
-                    Path imagePath = examFolder.resolve(imageName);
-                    Files.copy(image.getInputStream(), imagePath);
+                    if (Boolean.TRUE.equals(req.getIsCloudinary())) {
+                        String imageUrl = cloudinaryService.uploadFile(image);
+                        question.setImage(imageUrl);
+                        question.setIsCloudinary(true);
+                    } else {
+                        String examFolderPath = "C:/Users/DELL/Downloads/demoEnglishSpringBoot/src/main/resources/static/images/toeicTest" + examId;
+                        Path examFolder = Paths.get(examFolderPath);
+                        if (!Files.exists(examFolder)) {
+                            Files.createDirectories(examFolder); // Tạo thư mục nếu chưa có
+                        }
+                        // Lưu ảnh vào thư mục theo examId
+                        String originalImageName = image.getOriginalFilename();
+                        String imageName = System.currentTimeMillis() + "_" + originalImageName.replaceAll(" ", "_"); // Thay dấu cách bằng dấu gạch dưới
+                        Path imagePath = examFolder.resolve(imageName);
+                        Files.copy(image.getInputStream(), imagePath);
 
-                    // Lưu đường dẫn ảnh vào cơ sở dữ liệu (đường dẫn tương đối)
-                    toeicQuestion.setImage("/images/toeicTest" + examId + "/" + imageName);
-//                    toeicQuestion.setImage(imageName);
+                        // Lưu đường dẫn ảnh vào cơ sở dữ liệu (đường dẫn tương đối)
+                        question.setImage("/images/toeicTest" + examId + "/" + imageName);
+                    }
                 } catch (IOException e) {
                     throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
                 }
             }
-            toeicQuestion = toeicQuestionRepository.save(toeicQuestion);
-            ToeicQuestionResponse response = toeicQuestionMapper.toToeicQuestionResponse(toeicQuestion);
-            response.setImage(toeicQuestion.getImage());
-            responses.add(response);
+
+            ToeicQuestion saved = toeicQuestionRepository.save(question);
+            responses.add(toeicQuestionMapper.toToeicQuestionResponse(saved));
         }
         return responses;
     }
+
 
     public ToeicQuestionResponse updateToeicQuestion(Long questionId, ToeicQuestionUpdateRequest request, MultipartFile imageFile) {
         ToeicQuestion toeicQuestion = toeicQuestionRepository.findById(questionId)
@@ -104,18 +101,29 @@ public class ToeicQuestionService {
                 && imageFile != null && !imageFile.isEmpty()) {
             try {
                 Long examId = toeicQuestion.getToeicExam().getExamId();
-                String examFolderPath = "C:/Users/DELL/Downloads/demoEnglishSpringBoot/src/main/resources/static/images/toeicTest" + examId;
-                Path examFolder = Paths.get(examFolderPath);
-                if (!Files.exists(examFolder)) {
-                    Files.createDirectories(examFolder);
+
+                if (Boolean.TRUE.equals(request.getIsCloudinary())) {
+                    // Upload lên Cloudinary
+                    String imageUrl = cloudinaryService.uploadFile(imageFile);
+                    toeicQuestion.setImage(imageUrl);
+                    toeicQuestion.setIsCloudinary(true);
+                } else {
+                    // Upload lên local
+                    String examFolderPath = "C:/Users/DELL/Downloads/demoEnglishSpringBoot/src/main/resources/static/images/toeicTest" + examId;
+                    Path examFolder = Paths.get(examFolderPath);
+                    if (!Files.exists(examFolder)) {
+                        Files.createDirectories(examFolder);
+                    }
+
+                    String originalImageName = imageFile.getOriginalFilename();
+                    String imageName = System.currentTimeMillis() + "_" + originalImageName.replaceAll(" ", "_");
+                    Path imagePath = examFolder.resolve(imageName);
+                    Files.copy(imageFile.getInputStream(), imagePath);
+
+                    toeicQuestion.setImage("/images/toeicTest" + examId + "/" + imageName);
+                    toeicQuestion.setIsCloudinary(false);
                 }
 
-                String originalImageName = imageFile.getOriginalFilename();
-                String imageName = System.currentTimeMillis() + "_" + originalImageName.replaceAll(" ", "_");
-                Path imagePath = examFolder.resolve(imageName);
-                Files.copy(imageFile.getInputStream(), imagePath);
-
-                toeicQuestion.setImage("/images/toeicTest" + examId + "/" + imageName);
             } catch (IOException e) {
                 throw new AppException(ErrorCode.FILE_UPLOAD_ERROR);
             }
@@ -124,6 +132,7 @@ public class ToeicQuestionService {
         ToeicQuestion updatedToeicQuestion = toeicQuestionRepository.save(toeicQuestion);
         return toeicQuestionMapper.toToeicQuestionResponse(updatedToeicQuestion);
     }
+
 
 
 
@@ -191,11 +200,6 @@ public class ToeicQuestionService {
             case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
             default -> "";
         };
-    }
-
-    public ToeicQuestion findById(Long questionId) {
-        return toeicQuestionRepository.findById(questionId)
-                .orElseThrow(() -> new AppException(ErrorCode.TOEIC_QUESTION_NOT_EXITSTED));
     }
 
     public List<ToeicQuestionResponse> getToeicQuestionsByExamId(Long examId) {

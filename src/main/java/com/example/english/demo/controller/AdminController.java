@@ -198,14 +198,20 @@ public class AdminController {
                                       @RequestParam("imageFile") MultipartFile imageFile,
                                       @RequestParam("examId") Long examId,
                                       @RequestParam("part") Integer part,
+                                      @RequestParam(value = "isCloudinary", required = false) Boolean isCloudinary,
                                       RedirectAttributes redirectAttributes) {
         try {
-            toeicQuestionService.updateToeicQuestion(questionId, new ToeicQuestionUpdateRequest(), imageFile);
+            ToeicQuestionUpdateRequest request = new ToeicQuestionUpdateRequest();
+            request.setIsCloudinary(isCloudinary != null && isCloudinary); // gán true/false an toàn
+
+            toeicQuestionService.updateToeicQuestion(questionId, request, imageFile);
         } catch (AppException e) {
             redirectAttributes.addFlashAttribute("error", e.getErrorCode().getMessage());
         }
         return "redirect:/admin/show-toeic-question/" + examId + "?part=" + part;
     }
+
+
 
     @GetMapping("/createCourse")
     public String showCreateCourseForm(Model model) {

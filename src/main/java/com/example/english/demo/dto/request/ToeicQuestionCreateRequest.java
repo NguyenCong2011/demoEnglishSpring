@@ -17,4 +17,5 @@ public class ToeicQuestionCreateRequest {
     private String correctAnswer;
     private Integer part;
     private String image;
+    private Boolean isCloudinary = false;
 }
