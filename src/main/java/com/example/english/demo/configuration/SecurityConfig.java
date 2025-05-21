@@ -18,8 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    String[] publicRoutes = {"payment-callback","/payment/vnpay","/course/detail/{id}","/admin/createCourse","/course/list","/auth/refesh-token","/ws/**", "/topic/**","/app/invite","/app/accept-invite","/app/reject-invite", "/topic/invite/{userId}","/user/search-users","/user/toeic-detail/{examId}","/admin/update-question-image/{questionId}","/competition","/user/friends","/user/submit-toeic-exam","/user/show-toeic-question/{examId}","/admin/login","/user/toeic","/audio/**","/user/confirm-account/**","/admin/import-toeic-questions/{examId}","/images/**","/admin/show-toeic-question/{examId}","/admin/create-toeic-question/{examId}","/user/create","/auth/login","/login","/toeic","/online-tests","/","/admin/toeic","/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create","/toeic-exam/update/{examId}","/admin/create-toeic-exam"};
-
+    String[] publicRoutes = {"payment-callback", "/payment/vnpay", "/course/detail/{id}", "/course/list", "/auth/refesh-token", "/ws/**", "/topic/**", "/app/invite", "/app/accept-invite", "/app/reject-invite", "/topic/invite/{userId}", "/user/search-users", "/user/toeic-detail/{examId}", "/competition", "/user/friends", "/user/submit-toeic-exam", "/user/show-toeic-question/{examId}", "/admin/login", "/user/toeic", "/audio/**", "/user/confirm-account/**", "/images/**", "/user/create", "/auth/login", "/login", "/toeic", "/online-tests", "/", "/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create", "/toeic-exam/update/{examId}"};
     //@Value("${signer.key}")
     //private String Signer_Key;
     @Autowired
@@ -27,21 +26,28 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers(publicRoutes).permitAll()// Được phép truy cập không cần xác thực
-                        .anyRequest().authenticated());  // Các request khác cần phải xác thực
-
-        //này dùng  cấu hình cho route nào đó cần phải có token mà ch đk cấu hình bên trên
-        httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-        );
-        //cái csrf này là auto nó bật nên mk phải tắt đi,thường nếu ko tắt thì sẽ có lỗi foriden 403
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+        httpSecurity
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(publicRoutes).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/admin/login") // custom login page
+                        .defaultSuccessUrl("/")     // hoặc "/admin/dashboard"
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                )
+                .csrf(AbstractHttpConfigurer::disable); // Tùy chọn
 
         return httpSecurity.build();
     }
+
 
 //    hàm này học trên mạng về phân quyền
 //    @Bean
@@ -74,13 +80,13 @@ public class SecurityConfig {
 
     //override Bean Granted là giả dụ và giả dụ xong phải authen và nó bắt buộc phải có là admin thì mới được truy cập k cả có token hợp le
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter(){
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter=new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+        converter.setAuthorityPrefix("ROLE_"); // ✅ Mặc định của Spring
 
-        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
+        return jwtConverter;
     }
 
 
