@@ -26,6 +26,8 @@ public class ToeicExam{
     private int numOfQuestions;
     private String description;
     private String audio;
+    private Boolean isCloudinary = false;
+
 
     @OneToMany(mappedBy = "toeicExam")
     private List<ToeicQuestion> toeicQuestions;

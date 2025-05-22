@@ -32,10 +32,8 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/admin/login") // custom login page
-                        .defaultSuccessUrl("/")     // hoặc "/admin/dashboard"
-                        .permitAll()
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 )
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
@@ -43,10 +41,11 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                 )
-                .csrf(AbstractHttpConfigurer::disable); // Tùy chọn
+                .csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
     }
+
 
 
 //    hàm này học trên mạng về phân quyền

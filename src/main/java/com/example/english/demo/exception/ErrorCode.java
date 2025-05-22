@@ -21,6 +21,7 @@ public enum ErrorCode {
     TOEIC_QUESTION_EXITSTED(1555775,"Question existed",HttpStatus.BAD_REQUEST),
     TOEIC_QUESTION_NOT_EXITSTED(1555775,"Question not existed",HttpStatus.BAD_REQUEST),
     COMPETITION_NOT_FOUND(1555900, "Competition not found", HttpStatus.NOT_FOUND),
+    UPLOAD_FAILED(1213432343,"Faild upload",HttpStatus.BAD_REQUEST),
     USER_NOT_IN_COMPETITION(1555901, "User is not part of this competition", HttpStatus.FORBIDDEN);
 
 

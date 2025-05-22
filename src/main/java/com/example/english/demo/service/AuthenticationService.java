@@ -64,6 +64,7 @@ public class AuthenticationService {
         }
 
         var token =generateToken(user);
+        log.info("Generated JWT token: {}", token);
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)

@@ -21,4 +21,5 @@ public class ToeicExamCreateRequest {
     private String description;
     private String audio;
     private transient MultipartFile audioFile;
+    private Boolean isCloudinary = false;
 }

@@ -13,6 +13,7 @@ import com.example.english.demo.repository.UserRepository;
 import com.example.english.demo.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest; // Added import
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,18 +46,16 @@ public class AdminController {
 
     private final CourseService courseService;
 
+    private final CloudinaryService cloudinaryService;
+
     @GetMapping("/login")
     public String showAdminLoginPage() {
         return "admin/login";
     }
-    @GetMapping("/")
-    public String index(Model model) {
-        model.addAttribute("name", "John");
-        return "admin/home";
-    }
 
     @PostMapping("/login")
     public String processAdminLogin(@ModelAttribute @Valid AuthenticationRequest request,
+                                    HttpServletRequest httpRequest, // Added HttpServletRequest
                                     HttpServletResponse response,
                                     Model model) {
         try {
@@ -75,6 +73,21 @@ public class AdminController {
             var result = authenticationService.authenticate(request);
 
             if (result.isAuthenticated()) {
+                // Remove any existing 'jwt' cookie
+                Cookie[] cookies = httpRequest.getCookies(); // Changed request to httpRequest
+                if (cookies != null) {
+                    for (Cookie oldCookie : cookies) {
+                        if ("jwt".equals(oldCookie.getName())) {
+                            oldCookie.setValue("");
+                            oldCookie.setPath("/");
+                            oldCookie.setMaxAge(0);
+                            response.addCookie(oldCookie);
+                            break;
+                        }
+                    }
+                }
+
+                // Set the new 'jwt' cookie for the admin
                 Cookie cookie = new Cookie("jwt", result.getToken());
                 cookie.setHttpOnly(true);
                 cookie.setPath("/");
@@ -104,16 +117,29 @@ public class AdminController {
     public String createToeicExam(@ModelAttribute @Valid ToeicExamCreateRequest toeicExamCreateRequest,
                                   Model model) {
         try {
-            String audioFileName = fileUploadService.uploadAudioFile(toeicExamCreateRequest.getAudioFile());
+            MultipartFile audioFile = toeicExamCreateRequest.getAudioFile();
+            boolean isCloudinary = Boolean.TRUE.equals(toeicExamCreateRequest.getIsCloudinary());
+
+            String audioFileName;
+            if (isCloudinary) {
+                // Gọi Cloudinary upload
+                audioFileName = cloudinaryService.uploadAudio(audioFile); // bạn cần viết hàm này
+            } else {
+                // Gọi upload local
+                audioFileName = fileUploadService.uploadAudioFile(audioFile);
+            }
+
             toeicExamCreateRequest.setAudio(audioFileName);
             ToeicExamResponse toeicExamResponse = toeicExamService.createToeicExam(toeicExamCreateRequest);
+
             return "redirect:/admin/toeic";
         } catch (Exception e) {
             model.addAttribute("error", "Failed to create TOEIC exam: " + e.getMessage());
             model.addAttribute("toeicExamCreateRequest", toeicExamCreateRequest);
-            return "admin/createToeicExam";
+            return "admin/createToeicExam"; // Đây là view form (tên file .html)
         }
     }
+
 
     @GetMapping("/toeic")
     public String getToeicExams(@RequestParam(defaultValue = "1") int pageNo, Model model) {

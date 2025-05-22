@@ -81,12 +81,20 @@
         <button onclick="filterPart(7)">Part 7</button>
     </div>
 
-    <div th:if="${toeicExam.audio != null and !toeicExam.audio.isEmpty()}">
+    <!-- Nếu audio là đường dẫn Cloudinary -->
+    <div th:if="${toeicExam.audio != null and toeicExam.audio.startsWith('http')}">
+        <audio controls th:attr="src=${toeicExam.audio}"></audio>
+    </div>
+
+    <!-- Nếu audio là file local -->
+    <div th:if="${toeicExam.audio != null and !toeicExam.audio.startsWith('http')}">
         <audio controls>
             <source th:src="@{'/audio/' + ${toeicExam.audio}}" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
     </div>
+
+
 
     <form method="post" th:action="@{/user/submit-toeic-exam}">
         <input type="hidden" name="examId" th:value="${examId}" />

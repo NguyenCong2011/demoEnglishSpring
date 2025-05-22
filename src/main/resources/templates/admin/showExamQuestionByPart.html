@@ -126,17 +126,21 @@
     </form>
     </p>
 
-    <!-- Audio Player -->
-    <div th:if="${toeicExam.audio != null and !toeicExam.audio.isEmpty()}">
+    <!-- Nếu là link Cloudinary (bắt đầu bằng http) -->
+    <div th:if="${toeicExam.audio != null and toeicExam.audio.startsWith('http')}">
+        <audio controls th:attr="src=${toeicExam.audio}"></audio>
+        <p>Audio file: <span th:text="${toeicExam.audio}"></span></p>
+    </div>
+
+    <!-- Nếu là file nội bộ (không bắt đầu bằng http) -->
+    <div th:if="${toeicExam.audio != null and !toeicExam.audio.startsWith('http')}">
         <audio controls>
             <source th:src="@{'/audio/' + ${toeicExam.audio}}" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
         <p>Audio file: <span th:text="${toeicExam.audio}"></span></p>
     </div>
-    <div th:if="${toeicExam.audio == null or toeicExam.audio.isEmpty()}">
-        <p>No audio file available for this exam.</p>
-    </div>
+
 
     <!-- Danh sách câu hỏi -->
     <div class="question-list">

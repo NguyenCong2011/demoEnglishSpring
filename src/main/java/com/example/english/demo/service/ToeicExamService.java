@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,15 +26,38 @@ import java.util.stream.Collectors;
 public class ToeicExamService {
     private final ToeicExamMapper toeicExamMapper;
     private final ToeicExamRepository toeicExamRepository;
+    private final FileUploadService fileUploadService;
+    private final CloudinaryService cloudinaryService;
 
-    public ToeicExamResponse createToeicExam(ToeicExamCreateRequest toeicExamCreateRequest){
-        if(toeicExamRepository.existsByExamName(toeicExamCreateRequest.getExamName())){
-            throw new AppException(ErrorCode.TOEIC_EXAM_EXITSTED);
+//    public ToeicExamResponse createToeicExam(ToeicExamCreateRequest toeicExamCreateRequest){
+//        if(toeicExamRepository.existsByExamName(toeicExamCreateRequest.getExamName())){
+//            throw new AppException(ErrorCode.TOEIC_EXAM_EXITSTED);
+//        }
+//        ToeicExam toeicExam=toeicExamMapper.toToeicExam(toeicExamCreateRequest);
+//
+//        toeicExam=toeicExamRepository.save(toeicExam);
+//
+//        return toeicExamMapper.toToeicExamResponse(toeicExam);
+//    }
+
+    public ToeicExamResponse createToeicExam(ToeicExamCreateRequest request) {
+        String audioUrl;
+        try {
+            if (Boolean.TRUE.equals(request.getIsCloudinary())) {
+                audioUrl = cloudinaryService.uploadAudio(request.getAudioFile());
+            } else {
+                audioUrl = fileUploadService.uploadAudioFile(request.getAudioFile());
+            }
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.UPLOAD_FAILED);
         }
-        ToeicExam toeicExam=toeicExamMapper.toToeicExam(toeicExamCreateRequest);
 
-        toeicExam=toeicExamRepository.save(toeicExam);
+        request.setAudio(audioUrl);
 
+        ToeicExam toeicExam = toeicExamMapper.toToeicExam(request);
+        toeicExam.setIsCloudinary(Boolean.TRUE.equals(request.getIsCloudinary()));
+
+        toeicExam = toeicExamRepository.save(toeicExam);
         return toeicExamMapper.toToeicExamResponse(toeicExam);
     }
 
