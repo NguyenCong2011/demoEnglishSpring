@@ -41,25 +41,14 @@ public class ToeicExamService {
 //    }
 
     public ToeicExamResponse createToeicExam(ToeicExamCreateRequest request) {
-        String audioUrl;
-        try {
-            if (Boolean.TRUE.equals(request.getIsCloudinary())) {
-                audioUrl = cloudinaryService.uploadAudio(request.getAudioFile());
-            } else {
-                audioUrl = fileUploadService.uploadAudioFile(request.getAudioFile());
-            }
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.UPLOAD_FAILED);
-        }
-
-        request.setAudio(audioUrl);
-
         ToeicExam toeicExam = toeicExamMapper.toToeicExam(request);
         toeicExam.setIsCloudinary(Boolean.TRUE.equals(request.getIsCloudinary()));
 
         toeicExam = toeicExamRepository.save(toeicExam);
         return toeicExamMapper.toToeicExamResponse(toeicExam);
     }
+
+
 
     public ToeicExamResponse updateToeicExam(Long examId, ToeicExamUpdateRequest toeicExamUpdateRequest) {
         log.info("in method update toeic exam  alllll");

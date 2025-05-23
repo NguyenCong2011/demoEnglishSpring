@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableMethodSecurity
 @Configuration
@@ -25,25 +26,30 @@ public class SecurityConfig {
     private CustomJwtDecoder customJwtDecoder;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .authorizeHttpRequests(request -> request
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtCookieFilter jwtCookieFilter) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers(publicRoutes).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/auth/logout")
-                        .logoutSuccessUrl("/login?logout")
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
+                        .jwt(jwt -> jwt
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
                 )
                 .csrf(AbstractHttpConfigurer::disable);
 
-        return httpSecurity.build();
+        //cái này để lấy token từ cookies nhé xác định admin
+        http.addFilterBefore(jwtCookieFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // Cấu hình lại OAuth2 Resource Server với CustomJwtDecoder
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(customJwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
+
+        return http.build();
     }
 
 
@@ -79,14 +85,16 @@ public class SecurityConfig {
 
     //override Bean Granted là giả dụ và giả dụ xong phải authen và nó bắt buộc phải có là admin thì mới được truy cập k cả có token hợp le
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
-        converter.setAuthorityPrefix("ROLE_"); // ✅ Mặc định của Spring
+        converter.setAuthorityPrefix(""); // ⚠️ KHÔNG thêm "ROLE_" nữa vì đã có sẵn trong token
+        converter.setAuthoritiesClaimName("scope"); // ✅ đọc quyền từ claim "scope"
 
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
         jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
         return jwtConverter;
     }
+
 
 
 

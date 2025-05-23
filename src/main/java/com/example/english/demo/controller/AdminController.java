@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -238,7 +239,7 @@ public class AdminController {
     }
 
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/createCourse")
     public String showCreateCourseForm(Model model) {
         model.addAttribute("courseRequestDTO", new CourseRequestDTO());
