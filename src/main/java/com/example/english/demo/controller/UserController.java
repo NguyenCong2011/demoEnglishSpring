@@ -117,7 +117,7 @@ public class UserController {
 
     @GetMapping("/getAllUser")
     ApiResponse<List<UserResponse>> getUser(){
-        var authentication= SecurityContextHolder.getContext().getAuthentication();
+        var authentication= SecurityContextHolder.getContext().getAuthentication();//xác định đã đăng nhập
 
         log.info("Username: {}",authentication.getName());
         authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));

@@ -21,6 +21,7 @@ public class ApplicationInitConfig {
 
     private final PasswordEncoder passwordEncoder;
 
+//    @Beannày cho khi nào ứng dụng chạy cái là bean nay chạy luôn
     @Bean
     public ApplicationRunner applicationRunner(UserRepository userRepository,
                                                RoleRepository roleRepository) {

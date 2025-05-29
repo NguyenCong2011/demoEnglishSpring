@@ -73,12 +73,12 @@ public class AuthenticationService {
 
     //hàm này dùng bên trên
     private String generateToken(User user) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);//tạo header
 
         //tạo payload và claim là dữ liệu của mình
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
-                .issuer("cong.cong")
+                .subject(user.getUsername())// Người sở hữu token là username của User
+                .issuer("cong.cong")// Tên hệ thống phát hành token
                 .issueTime(new Date())  // Thời gian phát hành
                 .expirationTime(new Date(Instant.now().plus(VALID_DURRATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())// này để chúng ta get thêm claim id của token trên jwt.io
@@ -99,13 +99,13 @@ public class AuthenticationService {
             throw new RuntimeException(exception);
         }
     }
-//    hàm này cho vào scope
+//    hàm này cho vào scope  xây dựng một chuỗi quyền truy cập (scope) cho người dùng
     private String buildScope(User user){
         //dấu cách vì khi trả dữ liệu sẽ có các role cách nhau
         StringJoiner stringJoiner=new StringJoiner(" ");
         if(!CollectionUtils.isEmpty(user.getRoles()))
             user.getRoles().forEach(role -> {
-                stringJoiner.add("ROLE_"+role.getName());//cho ROLE_ vào đây làm prefix để pha biệt Role và Permission và khi lấy trên  jwwt ta có thể thấy ROLE_ đứng trước ADMIN
+                stringJoiner.add("ROLE_"+role.getName());//cho ROLE_ vào đây làm prefix để phan biệt Role và Permission và khi lấy trên  jwwt ta có thể thấy ROLE_ đứng trước ADMIN
                 if(!CollectionUtils.isEmpty(role.getPermissions())){
                     role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
                 }
@@ -115,18 +115,16 @@ public class AuthenticationService {
 
     //này dùng để verrify xem có phải đúng là token mk tạo ra hay không
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
-        var token=request.getToken();
+        var token = request.getToken();
+        boolean isValid = true;
+
         try {
-            verifyToken(token,false);
-        }catch (AppException exception){
-            return IntrospectResponse.builder()
-                    .valid(false)
-                    .build();
+            verifyToken(token, false);
+        } catch (AppException e) {
+            isValid = false;
         }
-        //
-        return IntrospectResponse.builder()
-                .valid(true)
-                .build();
+
+        return IntrospectResponse.builder().valid(isValid).build();
     }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
