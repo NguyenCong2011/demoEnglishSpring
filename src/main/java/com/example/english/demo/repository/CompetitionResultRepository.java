@@ -16,6 +16,7 @@ public interface CompetitionResultRepository extends JpaRepository<CompetitionRe
             Long examId2, String user1Id2, String user2Id2
     );
 
+    //câu này vi không có viết bằng method name được nên dùng @Query
     @Query("SELECT c FROM CompetitionResult c WHERE c.exam.examId = :examId AND (c.user1.id = :userId OR c.user2.id = :userId)")
     List<CompetitionResult> findByExamAndUser(@Param("examId") Long examId, @Param("userId") String userId);
 }

@@ -6,6 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ToeicExamRepository extends JpaRepository<ToeicExam,Long> {
-    boolean existsByExamName(String examName);
-    boolean findByExamName(String examName);
 }

@@ -143,57 +143,56 @@
     </form>
 </div>
 
-<!-- Script -->
+<!-- jQuery CDN (chèn vào trước thẻ script sử dụng jQuery nếu chưa có) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
     function filterPart(part) {
-        const items = document.querySelectorAll('.question-item');
-        items.forEach(item => {
-            const itemPart = item.getAttribute('data-part');
-            if (part === 'all' || itemPart === String(part)) {
-                item.style.display = 'block';
+        $('.question-item').each(function () {
+            const itemPart = $(this).data('part');
+            if (part === 'all' || itemPart === part) {
+                $(this).show();
             } else {
-                item.style.display = 'none';
+                $(this).hide();
             }
         });
 
-        document.querySelectorAll('.part-links button').forEach(btn => {
-            btn.classList.remove('active');
-        });
+        $('.part-links button').removeClass('active');
         if (part === 'all') {
-            document.querySelector('.part-links button:last-child').classList.add('active');
+            $('.part-links button:last-child').addClass('active');
         } else {
-            document.querySelectorAll('.part-links button')[part - 1].classList.add('active');
+            $('.part-links button').eq(part - 1).addClass('active');
         }
     }
 
-    function startTimer(duration, display) {
+    function startTimer(duration, $display) {
         let timer = duration, minutes, seconds;
-        setInterval(function () {
-            minutes = parseInt(timer / 60, 10);
-            seconds = parseInt(timer % 60, 10);
+        const intervalId = setInterval(function () {
+            minutes = Math.floor(timer / 60);
+            seconds = timer % 60;
 
             minutes = minutes < 10 ? "0" + minutes : minutes;
             seconds = seconds < 10 ? "0" + seconds : seconds;
 
-            display.textContent = minutes + ":" + seconds;
+            $display.text(minutes + ":" + seconds);
 
             if (--timer < 0) {
-                // Hết giờ thì submit bài
+                clearInterval(intervalId);
                 alert("Hết giờ! Bài thi sẽ được nộp tự động.");
-                document.querySelector('form').submit();
+                $('form').submit();
             }
         }, 1000);
     }
 
-    // Khi trang load xong
-    window.onload = function () {
-        filterPart(1); // Load tất cả câu hỏi ban đầu
+    $(document).ready(function () {
+        filterPart(1); // Load Part 1 ban đầu
 
-        const timeLimit = 120 * 60; // 120 phút -> giây
-        const display = document.getElementById('timer');
-        startTimer(timeLimit, display);
-    };
+        const timeLimit = 120 * 60; // 120 phút tính bằng giây
+        const $display = $('#timer');
+        startTimer(timeLimit, $display);
+    });
 </script>
+
 <script th:if="${#authorization.expression('isAuthenticated()')}">
     function getJwtFromCookie() {
         const value = `; ${document.cookie}`;
@@ -205,21 +204,18 @@
         const token = getJwtFromCookie();
         if (!token) return;
 
-        fetch('/auth/refesh-token', {
+        $.ajax({
+            url: '/auth/refesh-token',
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: token })
-        })
-        .then(res => {
-            if (!res.ok) throw new Error("Không làm mới được token");
-            return res.json();
-        })
-        .then(data => {
-            document.cookie = `jwt=${data.result.token}; path=/`;
-            console.log("✅ Token đã được làm mới");
-        })
-        .catch(err => {
-            console.warn("❌ Refresh token lỗi:", err);
+            contentType: 'application/json',
+            data: JSON.stringify({ token: token }),
+            success: function (data) {
+                document.cookie = `jwt=${data.result.token}; path=/`;
+                console.log("✅ Token đã được làm mới");
+            },
+            error: function (err) {
+                console.warn("❌ Refresh token lỗi:", err);
+            }
         });
     }
 

@@ -151,33 +151,14 @@
 </div>
 
 <script th:inline="javascript">
-  // Connect to WebSocket for competition updates
-  const socket = new SockJS('/ws');
-  const stompClient = Stomp.over(socket);
-  const roomId = /*[[${roomId}]]*/ '';
-  
-  if (roomId) {
-    stompClient.connect({}, function(frame) {
-      // Subscribe to competition updates
-      stompClient.subscribe('/topic/competition/' + roomId, function(message) {
-        const result = JSON.parse(message.body);
-        updateCompetitionStatus(result);
-      });
-    });
-  }
-
   function updateCompetitionStatus(result) {
-    const waitingElement = document.getElementById('competitionWaiting');
-    const resultElement = document.getElementById('competitionResult');
-    const resultMessage = document.getElementById('resultMessage');
-
     if (result.completed) {
-      waitingElement.style.display = 'none';
-      resultElement.style.display = 'block';
+      $('#competitionWaiting').hide();
+      $('#competitionResult').show();
 
-      let message = 'Kết quả cuộc thi:<br>';
-      message += `Người thi 1: ${result.user1Score} điểm<br>`;
-      message += `Người thi 2: ${result.user2Score} điểm<br>`;
+      let message = 'Kết quả cuộc thi:<br>' +
+        `Người thi 1: ${result.user1Score} điểm<br>` +
+        `Người thi 2: ${result.user2Score} điểm<br>`;
 
       if (result.user1Score > result.user2Score) {
         message += '<span class="win">Người chơi 1 thắng!</span>';
@@ -187,10 +168,11 @@
         message += '<span class="draw">Hòa!</span>';
       }
 
-      resultMessage.innerHTML = message;
+      $('#resultMessage').html(message);
     }
   }
 </script>
+
 
 <div th:replace="~{footer.html}"></div>
 </body>
