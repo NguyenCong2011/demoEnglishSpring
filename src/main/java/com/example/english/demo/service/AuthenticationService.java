@@ -138,7 +138,7 @@ public class AuthenticationService {
                     .id(jit)
                     .expiryTime(expiryTime)
                     .build();
-            invalidatedTokenRepository.save(invalidatedToken);
+            invalidatedTokenRepository.save(invalidatedToken);//lưu vào để xem user nào đã logout
         } catch (AppException exception) {
             log.info("Token already expiried");
         }
@@ -161,7 +161,7 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        // ny để check xem token đã logout chưa ý mà
+        // nay để check xem token đã logout chưa ý mà vì khi logout có thể vẫn dùng đk token
         if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
