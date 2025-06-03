@@ -48,37 +48,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-
-
-//    hàm này học trên mạng về phân quyền
-//    @Bean
-//    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//
-//        http
-//                .authorizeHttpRequests(authConfig -> {
-//                    authConfig.requestMatchers(HttpMethod.GET, "/", "/login", "/error", "/login-error", "/logout", "/css/**").permitAll();
-//                    authConfig.requestMatchers(HttpMethod.GET, "/user").hasRole("USER");
-//                    authConfig.requestMatchers(HttpMethod.GET, "/admin").hasRole("ADMIN");
-//                    authConfig.requestMatchers(HttpMethod.GET, "/developer").hasRole("DEVELOPER");
-//                    authConfig.requestMatchers(HttpMethod.GET, "/users").hasAnyRole("DEVELOPER");
-//                    authConfig.requestMatchers(HttpMethod.GET, "/authorities").hasAnyRole("DEVELOPER");
-//                    authConfig.anyRequest().authenticated();
-//                })
-//                .formLogin(login -> {
-//                            login.loginPage("/login");
-//                            login.defaultSuccessUrl("/");
-//                            login.failureUrl("/login-error");
-//                        }
-//                )
-//                .logout(logout -> {
-//                    logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
-//                    logout.logoutSuccessUrl("/");
-//                    logout.deleteCookies("JSESSIONID");
-//                    logout.invalidateHttpSession(true);
-//                });
-//        return http.build();
-//    }
-
     //override Bean Granted là giả dụ và giả dụ xong phải authen và nó bắt buộc phải có là admin thì mới được truy cập kể cả có token hợp le
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
@@ -91,18 +60,6 @@ public class SecurityConfig {
         return jwtConverter;
     }
 
-
-
-
-    //bean này dùng cho bên trên
-//    @Bean
-//    JwtDecoder jwtDecoder(){
-//        SecretKeySpec secretKeySpec=new SecretKeySpec(Signer_Key.getBytes(),"HS512");
-//        return NimbusJwtDecoder
-//                .withSecretKey(secretKeySpec)
-//                .macAlgorithm(MacAlgorithm.HS512)
-//                .build();
-//    }
     //trong này thì có thể ném ra file khác dùng chung
     @Bean
     PasswordEncoder passwordEncoder(){
