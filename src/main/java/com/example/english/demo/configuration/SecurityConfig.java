@@ -57,6 +57,16 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter11111(){
+
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter=new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
+    }
 
 
     //bean này dùng cho bên trên
