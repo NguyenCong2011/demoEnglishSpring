@@ -19,12 +19,6 @@ public class ToeicExam{
     @Column(name = "exam_id")
     private Long examId;
     @Column(unique = true)
-    private String examName;
-    private int duration;
-    private int numOfParticipants;
-    private int numOfSections;
-    private int numOfQuestions;
-    private String description;
     private String audio;
     private Boolean isCloudinary = false;
 

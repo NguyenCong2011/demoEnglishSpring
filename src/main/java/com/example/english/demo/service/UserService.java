@@ -12,6 +12,7 @@ import com.example.english.demo.repository.RoleRepository;
 import com.example.english.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -78,11 +79,7 @@ public class UserService {
     }
 
     public UserResponse createUser(UserCreateRequest request){
-        //
-        if(userRepository.existsByUsername(request.getUsername())){
-            throw new AppException(ErrorCode.USER_EXITSTED);
-        }
-        //
+
         User user=userMapper.toUser(request);
         //
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -90,9 +87,13 @@ public class UserService {
         HashSet<String> roles=new HashSet<>();
         roles.add(Roles.USER.name());
         user.setActive(false);
-        user = userRepository.save(user);
 
-        // ✅ Generate JWT token để xác nhận email
+        try {
+            user = userRepository.save(user);
+        } catch (DataIntegrityViolationException exception) {//đây chính là exception nesm ra khi tạo 10 request tạo user nhưng trùng username
+            throw new AppException(ErrorCode.USER_EXITSTED);
+        }
+
         String confirmationToken = authenticationService.generateConfirmationToken(user);
 
         SimpleMailMessage mailMessage = new SimpleMailMessage();

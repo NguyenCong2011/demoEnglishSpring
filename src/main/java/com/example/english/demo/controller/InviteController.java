@@ -1,10 +1,7 @@
 package com.example.english.demo.controller;
 
-import com.example.english.demo.entity.CompetitionResult;
 import com.example.english.demo.entity.Invitation;
 import com.example.english.demo.entity.InviteMessage;
-import com.example.english.demo.entity.ToeicExam;
-import com.example.english.demo.entity.User;
 import com.example.english.demo.repository.CompetitionResultRepository;
 import com.example.english.demo.repository.ToeicExamRepository;
 import com.example.english.demo.repository.UserRepository;
@@ -16,7 +13,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor

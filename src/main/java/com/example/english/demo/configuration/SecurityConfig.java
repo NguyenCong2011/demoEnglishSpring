@@ -2,7 +2,6 @@ package com.example.english.demo.configuration;
 
 //file này chứa các bean để inject
 import com.example.english.demo.enums.Roles;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -20,11 +19,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    String[] publicRoutes = {"payment-callback", "/payment/vnpay", "/course/detail/{id}", "/course/list", "/auth/refesh-token", "/ws/**", "/topic/**", "/app/invite", "/app/accept-invite", "/app/reject-invite", "/topic/invite/{userId}", "/user/search-users", "/user/toeic-detail/{examId}", "/competition", "/user/friends", "/user/submit-toeic-exam", "/user/show-toeic-question/{examId}", "/admin/login", "/user/toeic", "/audio/**", "/user/confirm-account/**", "/images/**", "/user/create", "/auth/login", "/login", "/toeic", "/online-tests", "/", "/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create", "/toeic-exam/update/{examId}"};
-    //@Value("${signer.key}")
-    //private String Signer_Key;
-    @Autowired
+    String[] publicRoutes = {"payment-callback", "/payment/vnpay", "/course/detail/{id}", "/course/list", "/auth/refesh-token", "/ws/**", "/topic/**", "/app/invite", "/app/accept-invite", "/app/reject-invite", "/topic/invite/{userId}", "/user/search-users", "/user/toeic-detail/{examId}", "/competition", "/user/friends", "/user/submit-toeic-exam", "/user/show-toeic-question/{examId}", "/admin/login", "/user/toeic", "/audio/**", "/user/confirm-account/**", "/images/**", "/user/create", "/auth/login", "/api/login", "/toeic", "/online-tests", "/", "/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create", "/toeic-exam/update/{examId}"};
     private CustomJwtDecoder customJwtDecoder;
+
+    public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
+        this.customJwtDecoder = customJwtDecoder;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtCookieFilter jwtCookieFilter) throws Exception {
@@ -52,8 +52,8 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
-        converter.setAuthorityPrefix(""); // ⚠️ KHÔNG thêm "ROLE_" nữa vì đã có sẵn trong token
-        converter.setAuthoritiesClaimName("scope"); // ✅ đọc quyền từ claim "scope"
+        converter.setAuthorityPrefix(""); //  KHÔNG thêm "ROLE_" nữa vì đã có sẵn trong token
+        converter.setAuthoritiesClaimName("scope"); // đọc quyền từ claim "scope"
 
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
         jwtConverter.setJwtGrantedAuthoritiesConverter(converter);

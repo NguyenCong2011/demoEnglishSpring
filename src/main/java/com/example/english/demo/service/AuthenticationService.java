@@ -1,16 +1,16 @@
 package com.example.english.demo.service;
 
-import com.example.english.demo.dto.request.AuthenticationRequest;
 import com.example.english.demo.dto.request.IntrospectRequest;
+import com.example.english.demo.dto.request.LoginRequest;
 import com.example.english.demo.dto.request.LogoutRequest;
 import com.example.english.demo.dto.request.RefeshRequest;
 import com.example.english.demo.dto.response.AuthenticationResponse;
 import com.example.english.demo.dto.response.IntrospectResponse;
 import com.example.english.demo.entity.InvalidatedToken;
-import com.example.english.demo.exception.AppException;
-import com.example.english.demo.repository.InvalidatedTokenRepository;
 import com.example.english.demo.entity.User;
+import com.example.english.demo.exception.AppException;
 import com.example.english.demo.exception.ErrorCode;
+import com.example.english.demo.repository.InvalidatedTokenRepository;
 import com.example.english.demo.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -51,7 +51,7 @@ public class AuthenticationService {
     @Value("${refeshable-duration}")
     private long REFESHABLE_DURATION;
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse authenticate(LoginRequest request) {
         var user = userRepository.findByUsername(request.getUsername())
                 .filter(User::isActive)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));

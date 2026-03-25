@@ -16,6 +16,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    //cho dòng này vào giúp cho ví dụ khi tạo 10 user cùng tên thì chri 1 người tạo được(request concurrent)
+    //giúp tăng performance vì để cho sql làm rồi k cần chọc vào đb rồi check nữa
+    @Column(name="username",unique = true,columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     private String username;
     private String password;
     private String firstName;

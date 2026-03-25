@@ -3,10 +3,11 @@ package com.example.english.demo.controller;
 import com.example.english.demo.dto.request.CoursePaymentRequest;
 import com.example.english.demo.dto.response.CourseResponseDTO;
 import com.example.english.demo.entity.Course;
-import com.example.english.demo.entity.CoursePayment;
+import com.example.english.demo.entity.User;
 import com.example.english.demo.enums.PaymentStatus;
 import com.example.english.demo.repository.CoursePaymentRepository;
 import com.example.english.demo.repository.CourseRepository;
+import com.example.english.demo.repository.UserRepository;
 import com.example.english.demo.service.CoursePaymentService;
 import com.example.english.demo.service.CourseService;
 import com.example.english.demo.service.VNPayService;
@@ -14,7 +15,6 @@ import com.example.english.demo.util.VNPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import com.example.english.demo.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,13 +22,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import com.example.english.demo.entity.User;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Logger; // Import Logger
+import java.util.logging.Logger;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,8 +42,7 @@ public class VNPayController {
 
     private final CourseRepository courseRepository;
 
-    private final CoursePaymentRepository coursePaymentRepository;
-    private final UserRepository userRepository; // Inject UserRepository
+    private final UserRepository userRepository;
 
     private final CoursePaymentService coursePaymentService;
 

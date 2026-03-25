@@ -55,7 +55,7 @@ public class AdminController {
     }
 
     @PostMapping("/login")
-    public String processAdminLogin(@ModelAttribute @Valid AuthenticationRequest request,
+    public String processAdminLogin(@ModelAttribute @Valid LoginRequest request,
                                     HttpServletRequest httpRequest, // Added HttpServletRequest
                                     HttpServletResponse response,
                                     Model model) {
