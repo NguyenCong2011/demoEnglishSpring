@@ -70,20 +70,8 @@ public class SecurityConfig {
         return jwtConverter;
     }
 
-<<<<<<< HEAD
-=======
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter11111(){
-
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter=new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
-    }
-    @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter111111(){
 
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter=new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
@@ -103,8 +91,6 @@ public class SecurityConfig {
 //                .macAlgorithm(MacAlgorithm.HS512)
 //                .build();
 //    }
->>>>>>> origin/test2
-    //trong này thì có thể ném ra file khác dùng chung
     @Bean
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(10);
