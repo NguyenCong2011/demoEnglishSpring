@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Chi tiết khóa học</title>
+</head>
+<body>
+<div th:replace="~{header.html}"></div>
+
+<div class="container mx-auto py-10 px-6">
+  <h1 class="text-3xl font-bold text-blue-600 mb-4" th:text="${course.courseName}">Tên khóa học</h1>
+
+  <p class="text-lg mb-4">
+    Khoá học <strong th:text="${course.courseName}">Complete TOEIC</strong> do STUDY4 biên soạn và xây dựng gồm bài giảng dạy chi tiết kỹ lưỡng các chủ điểm ngữ pháp quan trọng và tất cả các dạng câu hỏi trong bài thi TOEIC Listening và Reading, cùng hơn 20.000 câu hỏi trắc nghiệm chuẩn format TOEIC mới nhất 2024. Tất cả các câu hỏi bài tập đều có giải thích chi tiết, dịch nghĩa và transcript (đối với bài nghe).
+  </p>
+
+  <ul class="list-disc pl-5 mb-4">
+    <li>Tổng hợp 1200 từ vựng TOEIC có khả năng 99% sẽ xuất hiện trong bài thi thật và 17 chủ đề ngữ pháp quan trọng nhất</li>
+    <li>Các bài luyện nghe chép chính tả (điền từ và điền câu) từ đề thi chuẩn form TOEIC để học viên luyện tập kỹ năng nghe và nhanh chóng khắc phục các vấn đề thường gặp</li>
+  </ul>
+
+  <h2 class="text-2xl font-semibold mt-6 mb-2">Bạn sẽ học như thế nào?</h2>
+
+  <h3 class="text-xl font-medium mt-4">Học từ vựng và ngữ pháp</h3>
+  <p>
+    Thông qua bộ flashcards 1200 từ kèm rất nhiều bài tập và các bài lý thuyết kèm bài tập ngữ pháp, bạn sẽ củng cố kiến thức nền Tiếng Anh.
+  </p>
+
+  <h3 class="text-xl font-medium mt-4">Học cách làm các dạng câu hỏi trong bài thi TOEIC Listening và Reading</h3>
+  <p>
+    Mỗi phần thi (part 1-7) trong đề TOEIC đều có các dạng câu hỏi nhất định. Bạn sẽ nắm chắc cách làm qua các bài giảng lý thuyết và các câu hỏi bài tập có giải thích chi tiết.
+  </p>
+
+  <h3 class="text-xl font-medium mt-4">Luyện nghe chép chính tả</h3>
+  <p>
+    Song song với việc học từ vựng, ngữ pháp và luyện đề, bạn sẽ được cải thiện kỹ năng nghe và khắc phục triệt để các vấn đề khi nghe với các bài tập nghe chép chính tả.
+  </p>
+
+  <h3 class="text-xl font-medium mt-4">Học từ vựng TOEIC</h3>
+  <p>
+    Khóa học cung cấp 1200 từ vựng 99% sẽ xuất hiện trong bài thi TOEIC. Mỗi flashcard gồm ảnh, nghĩa tiếng Việt - tiếng Anh, phát âm, phiên âm và ví dụ. Bạn có thể luyện tập thêm các list từ với đa dạng các bài tập mini-games.
+  </p>
+</div>
+<div class="mt-10 text-center">
+  <a href="/course/list" class="text-blue-500 hover:underline text-lg">
+    ← Quay lại khóa học
+  </a>
+  <a th:href="@{/payment/vnpay(courseId=${course.id})}"
+     class="inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded">
+    Đăng ký ngay
+  </a>
+</div>
+
+<div th:replace="~{footer.html}"></div>
+</body>
+</html>

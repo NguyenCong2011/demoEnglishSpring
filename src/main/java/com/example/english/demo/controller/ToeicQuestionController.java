@@ -44,12 +44,12 @@ public class ToeicQuestionController {
 //        return apiResponse;
 //    }
 
-
-    @PutMapping("/update/{questionId}")
-    public ApiResponse<ToeicQuestionResponse> updateToeicQuestion(@PathVariable Long questionId, @RequestBody ToeicQuestionUpdateRequest request) {
-        ApiResponse<ToeicQuestionResponse> apiResponse = new ApiResponse<>();
-        ToeicQuestionResponse response = toeicQuestionService.updateToeicQuestion(questionId, request);
-        apiResponse.setResult(response);
-        return apiResponse;
-    }
+//
+//    @PutMapping("/update/{questionId}")
+//    public ApiResponse<ToeicQuestionResponse> updateToeicQuestion(@PathVariable Long questionId, @RequestBody ToeicQuestionUpdateRequest request) {
+//        ApiResponse<ToeicQuestionResponse> apiResponse = new ApiResponse<>();
+//        ToeicQuestionResponse response = toeicQuestionService.updateToeicQuestion(questionId, request);
+//        apiResponse.setResult(response);
+//        return apiResponse;
+//    }
 }

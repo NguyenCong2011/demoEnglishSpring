@@ -6,10 +6,14 @@ import com.example.english.demo.dto.response.IntrospectResponse;
 import com.example.english.demo.dto.response.UserResponse;
 import com.example.english.demo.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.text.ParseException;
 //
@@ -58,24 +62,34 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/login")
-    public String authenticate(@ModelAttribute @Valid AuthenticationRequest request, Model model) {
-        ApiResponse<AuthenticationResponse> apiResponse = new ApiResponse<>();
 
-        try {
-            var result = authenticationService.authenticate(request);
-
-            if (result.isAuthenticated()) {
-                apiResponse.setResult(result);
-                return "redirect:/";
-            } else {
-                model.addAttribute("error", "Invalid username or password!");
-                return "login";
+    @GetMapping("/logout")
+    public ModelAndView logout(HttpServletRequest request, HttpServletResponse response, ModelAndView modelAndView) throws ParseException, JOSEException {
+        // Lấy token từ cookie
+        String token = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
             }
-        } catch (Exception e) {
-            model.addAttribute("error", "Authentication failed");
-            return "login";
         }
+
+        // Nếu có token thì gọi service để blacklist
+        if (token != null && !token.isEmpty()) {
+            authenticationService.logout(new LogoutRequest(token));
+        }
+
+        // Xóa cookie
+        Cookie cookie = new Cookie("jwt", "");
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        // Chuyển hướng về trang chủ
+        modelAndView.setViewName("redirect:/");
+        return modelAndView;
     }
 
 
@@ -88,13 +102,6 @@ public class AuthenticationController {
                 .build();
     }
 
-    @PostMapping("/logout")
-    public ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
-        authenticationService.logout(request);
-
-        return ApiResponse.<Void>builder()
-                .build();
-    }
 
     @PostMapping("/refesh-token")
     public ApiResponse<AuthenticationResponse> refeshToken(@RequestBody RefeshRequest request)

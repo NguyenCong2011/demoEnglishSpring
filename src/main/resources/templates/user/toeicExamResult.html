@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Kết quả TOEIC</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .content-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .correct {
+      color: green;
+      font-weight: bold;
+    }
+
+    .summary {
+      font-size: 20px;
+      margin-top: 30px;
+    }
+
+    a {
+      text-decoration: none;
+      color: #007BFF;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .competition-status {
+      margin-top: 30px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .competition-waiting {
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    .competition-complete {
+      font-weight: bold;
+    }
+
+    .win {
+      color: green;
+    }
+
+    .lose {
+      color: red;
+    }
+
+    .draw {
+      color: orange;
+    }
+
+    .action-buttons {
+      margin-top: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid #007bff;
+      color: #007bff;
+    }
+  </style>
+  <!-- SockJS + STOMP -->
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<div th:replace="~{header.html}"></div>
+
+<div class="content-container">
+  <h2>Kết quả bài thi TOEIC</h2>
+
+  <table>
+    <thead>
+    <tr>
+      <th>Part</th>
+      <th>Số câu đúng</th>
+      <th>Tổng số câu</th>
+      <th>Chi tiết</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="partResult : ${partResults}">
+      <td th:text="${partResult['part']}"></td>
+      <td><span th:text="${partResult['correct']}"></span></td>
+      <td th:text="${partResult['total']}"></td>
+      <td>
+        <a th:href="@{/user/show-toeic-question/{examId}(examId=${examId}, part=${partResult['part']})}">Xem lại</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div class="summary">
+    Tổng số câu đúng: <span class="correct" th:text="${totalCorrect}"></span> /
+    <span th:text="${totalQuestions}"></span>
+  </div>
+
+  <div class="action-buttons">
+    <a th:href="@{/user/toeic-detail/{examId}(examId=${examId})}" class="btn btn-outline">Quay lại thông tin đề thi</a>
+    <a th:href="@{/user/toeic}" class="btn btn-primary">Xem các đề thi khác</a>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  function updateCompetitionStatus(result) {
+    if (result.completed) {
+      $('#competitionWaiting').hide();
+      $('#competitionResult').show();
+
+      let message = 'Kết quả cuộc thi:<br>' +
+        `Người thi 1: ${result.user1Score} điểm<br>` +
+        `Người thi 2: ${result.user2Score} điểm<br>`;
+
+      if (result.user1Score > result.user2Score) {
+        message += '<span class="win">Người chơi 1 thắng!</span>';
+      } else if (result.user2Score > result.user1Score) {
+        message += '<span class="lose">Người chơi 2 thắng!</span>';
+      } else {
+        message += '<span class="draw">Hòa!</span>';
+      }
+
+      $('#resultMessage').html(message);
+    }
+  }
+</script>
+
+
+<div th:replace="~{footer.html}"></div>
+</body>
+</html>

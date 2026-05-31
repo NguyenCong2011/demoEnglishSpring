@@ -25,6 +25,7 @@ public class ToeicQuestion {
     private String correctAnswer;
     private String image;
     private Integer part;
+    private Boolean isCloudinary=false;
 
     @ManyToOne
     @JoinColumn(name = "fk_exam_id" , referencedColumnName = "exam_id")

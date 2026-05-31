@@ -12,15 +12,17 @@ import com.example.english.demo.repository.RoleRepository;
 import com.example.english.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 //annotation này của lombook nhá
 @RequiredArgsConstructor
@@ -28,27 +30,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserService {
 
+    private final AuthenticationService authenticationService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-
-    //  trước là public User nhưng mà chúng ta không trả về tất cả các dữ liệu của User nên phải tạo UserResponse
-    public UserResponse createUser(UserCreateRequest request){
-        //
-        if(userRepository.existsByUsername(request.getUsername())){
-            throw new AppException(ErrorCode.USER_EXITSTED);
-        }
-        //
-        User user=userMapper.toUser(request);
-        //
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        //
-        HashSet<String> roles=new HashSet<>();
-        roles.add(Roles.USER.name());
-
-        return userMapper.toUserResponse(userRepository.save(user));
-    }
+    private final EmailSenderService emailSenderService;
 
     @PostAuthorize("returnObject.owner == authentication.name")//dòng log bên dưới vẫn được in ra kể cả k phải admin,tức là ngược với preauthorize
     public UserResponse getUserById(String id){
@@ -90,4 +77,46 @@ public class UserService {
 
         return userMapper.toUserResponse(user);
     }
+
+    public UserResponse createUser(UserCreateRequest request){
+
+        User user=userMapper.toUser(request);
+        //
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        //
+        HashSet<String> roles=new HashSet<>();
+        roles.add(Roles.USER.name());
+        user.setActive(false);
+
+        try {
+            user = userRepository.save(user);
+        } catch (DataIntegrityViolationException exception) {//đây chính là exception nesm ra khi tạo 10 request tạo user nhưng trùng username
+            throw new AppException(ErrorCode.USER_EXITSTED);
+        }
+
+        String confirmationToken = authenticationService.generateConfirmationToken(user);
+
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(request.getEmail());
+        mailMessage.setSubject("Xác nhận đăng ký");
+        mailMessage.setText("Nhấn vào link để xác nhận: "
+                +"http://localhost:8080/user/confirm-account?token=" + confirmationToken);
+        emailSenderService.sendMail(mailMessage);
+        return userMapper.toUserResponse(user);
+    }
+
+    public List<User> searchUsersByKeyword(String keyword) {
+        return userRepository.findByUsernameContainingIgnoreCase(keyword);
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        String username = authentication.getName();
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
 }

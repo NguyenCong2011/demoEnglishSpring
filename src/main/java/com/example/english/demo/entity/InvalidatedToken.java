@@ -1,5 +1,5 @@
 package com.example.english.demo.entity;
-
+//class này lưu các token logout
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;

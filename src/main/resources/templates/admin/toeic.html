@@ -4,116 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TOEIC Test</title>
-    <style>
-        /* Phần Pagination */
-        .pagination a.active {
-            background-color: #007BFF;
-            color: white;
-        }
-
-        /* Màu xanh khi di chuột vào số trang */
-        .pagination a:hover {
-            background-color: #007BFF;
-            color: white;
-        }
-
-        /* Cấu hình cho body */
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-
-        /* Container chứa nội dung */
-        .content-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: left;
-        }
-
-        /* Tiêu đề chính */
-        h2 {
-            font-weight: bold;
-            font-size: 24px;
-        }
-
-        /* Danh sách các bài thi */
-        .test-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            gap: 5px;
-        }
-
-        .test-list div {
-            margin: 0 1px;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 32%; /* Mỗi bài thi chiếm 32% chiều rộng của container */
-            box-sizing: border-box;
-        }
-
-        /* Hiệu ứng khi di chuột vào các bài thi */
-        .test-list div:hover {
-            background-color: #007BFF;
-            color: white;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .pagination a {
-            margin: 0 5px;
-            padding: 10px 15px;
-            background-color: #f1f1f1;
-            border-radius: 5px;
-            text-decoration: none;
-            color: black;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div th:replace="~{header.html}"></div>
-<div class="content-container">
-    <a href="http://localhost:8080/admin/create-toeic-exam">Create TOEIC Exam</a>
-    <div><strong>Total Exams:</strong> <span th:text="${listToeicExams.totalElements}"></span></div>
+<body class="bg-gray-50 text-gray-900">
 
-    <!-- Hiển thị các bài thi theo từng trang -->
-    <div class="test-list">
-        <div th:each="toeicExam : ${listToeicExams.content}">
-<!--            <a th:href="@{/admin/create-toeic-question/{examId}(examId=${toeicExam.examId})}" method="get">-->
+<!-- Header -->
+<div th:replace="~{header.html}"></div>
+
+<!-- Thư viện đề thi -->
+<div class="max-w-6xl mx-auto p-6">
+    <h2 class="text-3xl font-bold mb-6">Thư viện đề thi</h2>
+
+    <!-- Các loại đề -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-6">
+        <a href="/online-tests" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">Tất cả</a>
+        <a href="/ielts-academic" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">IELTS Academic</a>
+        <a href="/ielts-general" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">IELTS General</a>
+        <a href="/admin/toeic" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">TOEIC</a>
+        <a href="/hsk-1" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">HSK 1</a>
+        <a href="/hsk-2" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">HSK 2</a>
+        <a href="/hsk-3" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">HSK 3</a>
+        <a href="/hsk-4" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">HSK 4</a>
+        <a href="/hsk-5" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">HSK 5</a>
+        <a href="/hsk-6" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">HSK 6</a>
+        <a href="/topik-i" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">TOPIK I</a>
+        <a href="/topik-ii" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">TOPIK II</a>
+        <a href="/toan-thptqg" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">Toán THPTQG</a>
+        <a href="/tieng-anh-thptqg" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">Tiếng Anh THPTQG</a>
+        <a href="/sinh-hoc-thptqg" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">Sinh học THPTQG</a>
+        <a href="/hoa-hoc-thptqg" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">Hóa học THPTQG</a>
+        <a href="/vat-ly-thptqg" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">Vật lý THPTQG</a>
+        <a href="/new-sat" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">NEW SAT</a>
+        <a href="/act" class="bg-white px-4 py-2 shadow rounded hover:bg-blue-100">ACT</a>
+    </div>
+
+    <!-- Tìm kiếm -->
+    <div class="mb-6 flex gap-2">
+        <input type="text" id="search" placeholder="Nhập từ khoá bạn muốn tìm kiếm..."
+               class="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring focus:border-blue-400">
+        <button onclick="searchTest()"
+                class="bg-blue-600 text-white px-9 py-1 rounded-lg hover:bg-blue-700">
+            Tìm kiếm
+        </button>
+    </div>
+
+    <div id="search-results"></div>
+</div>
+
+<!-- Danh sách đề thi TOEIC -->
+<div class="max-w-6xl mx-auto px-6 pb-12">
+    <a href="/admin/create-toeic-exam"
+       class="inline-block mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+        + Tạo đề TOEIC
+    </a>
+    <div class="text-lg mb-4">
+        <strong>Tổng số đề thi:</strong> <span th:text="${listToeicExams.totalElements}"></span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div th:each="toeicExam : ${listToeicExams.content}"
+             class="bg-white shadow p-4 rounded hover:bg-blue-50">
             <a th:href="@{/admin/show-toeic-question/{examId}(examId=${toeicExam.examId})}">
-                <p><strong>Exam Name:</strong> <span th:text="${toeicExam.examName}"></span></p>
-                <p><strong>Duration:</strong> <span th:text="${toeicExam.duration}"></span> minutes</p>
-                <p><strong>Number of Participants:</strong> <span th:text="${toeicExam.numOfParticipants}"></span></p>
-                <p><strong>Number of Sections:</strong> <span th:text="${toeicExam.numOfSections}"></span></p>
-                <p><strong>Number of Questions:</strong> <span th:text="${toeicExam.numOfQuestions}"></span></p>
-                <p><strong>Description:</strong> <span th:text="${toeicExam.description}"></span></p>
-                <p><strong>Comments:</strong></p>
-                <ul>
+                <p class="font-bold text-xl mb-2" th:text="${toeicExam.examName}"></p>
+                <p>⏱ <strong>Thời lượng:</strong> <span th:text="${toeicExam.duration}"></span> phút</p>
+                <p>👤 <strong>Người tham gia:</strong> <span th:text="${toeicExam.numOfParticipants}"></span></p>
+                <p>📚 <strong>Số phần:</strong> <span th:text="${toeicExam.numOfSections}"></span></p>
+                <p>❓ <strong>Số câu:</strong> <span th:text="${toeicExam.numOfQuestions}"></span></p>
+                <p>📝 <strong>Mô tả:</strong> <span th:text="${toeicExam.description}"></span></p>
+                <p class="mt-2 font-semibold">💬 Bình luận:</p>
+                <ul class="list-disc list-inside text-sm">
                     <li th:each="comment : ${toeicExam.comments}" th:text="${comment}"></li>
                 </ul>
             </a>
         </div>
     </div>
 
-    <!-- Phân trang -->
-    <div class="pagination" th:if="${listToeicExams.totalElements > 0}">
+    <!-- Pagination -->
+    <div class="flex justify-center mt-8" th:if="${listToeicExams.totalElements > 0}">
         <a th:each="pageNum : ${#numbers.sequence(1, listToeicExams.totalPages)}"
            th:href="@{/admin/toeic(pageNo=${pageNum})}"
            th:text="${pageNum}"
-           th:classappend="${pageNum == currentPage} ? 'active' : ''"></a>
+           th:classappend="${pageNum == currentPage} ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black'"
+           class="mx-1 px-4 py-2 rounded hover:bg-blue-500 hover:text-white transition">
+        </a>
     </div>
 </div>
+
 <div th:replace="~{footer.html}"></div>
+
+<script>
+    function searchTest() {
+        const keyword = document.getElementById("search").value;
+        window.location.href = `/admin/toeic?keyword=${encodeURIComponent(keyword)}`;
+    }
+</script>
 </body>
 </html>

@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
-
+//file này để decode token
 import javax.crypto.spec.SecretKeySpec;
 import java.text.ParseException;
 import java.util.Objects;
@@ -31,6 +31,7 @@ public class CustomJwtDecoder implements JwtDecoder {
     public Jwt decode(String token) throws JwtException {
 
         try {
+//            check xem token còn hiệu lực không
             var response = authenticationService.introspect(
                     IntrospectRequest.builder().token(token).build());
 
@@ -39,6 +40,7 @@ public class CustomJwtDecoder implements JwtDecoder {
             throw new JwtException(e.getMessage());
         }
 
+//        nếu token còn hiệu lực
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
             nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec)
