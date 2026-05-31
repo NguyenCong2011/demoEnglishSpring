@@ -1,9 +1,7 @@
 package com.example.english.demo.configuration;
 
 //file này chứa các bean để inject
-
-import com.example.english.demo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.english.demo.enums.Roles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -15,58 +13,53 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableMethodSecurity
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    String[] publicRoutes = {"/admin/import-toeic-questions/{examId}","/images/**","/admin/show-toeic-question/{examId}","/admin/create-toeic-question/{examId}","/user/create","/auth/login","/login","/toeic","/online-tests","/","/admin/toeic","/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create","/toeic-exam/update/{examId}","/admin/create-toeic-exam"};
-
-    //@Value("${signer.key}")
-    //private String Signer_Key;
-    @Autowired
+    String[] publicRoutes = {"payment-callback", "/payment/vnpay", "/course/detail/{id}", "/course/list", "/auth/refesh-token", "/ws/**", "/topic/**", "/app/invite", "/app/accept-invite", "/app/reject-invite", "/topic/invite/{userId}", "/user/search-users", "/user/toeic-detail/{examId}", "/competition", "/user/friends", "/user/submit-toeic-exam", "/user/show-toeic-question/{examId}", "/admin/login", "/user/toeic", "/audio/**", "/user/confirm-account/**", "/images/**", "/user/create", "/auth/login", "/api/login", "/toeic", "/online-tests", "/", "/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create", "/toeic-exam/update/{examId}"};
     private CustomJwtDecoder customJwtDecoder;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers(publicRoutes).permitAll()// Được phép truy cập không cần xác thực
-                        .anyRequest().authenticated());  // Các request khác cần phải xác thực
+    public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
+        this.customJwtDecoder = customJwtDecoder;
+    }
 
-        //này dùng  cấu hình cho route nào đó cần phải có token mà ch đk cấu hình bên trên
-        httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtCookieFilter jwtCookieFilter) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(publicRoutes).permitAll()
+                        .requestMatchers("/admin/**").hasRole(Roles.ADMIN.name())
+                        .anyRequest().authenticated()
+                )
+                .csrf(AbstractHttpConfigurer::disable);
+
+        //cái này để lấy token từ cookies nhé xác định admin
+        http.addFilterBefore(jwtCookieFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // Cấu hình lại OAuth2 Resource Server với CustomJwtDecoder
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-        );
-        //cái csrf này là auto nó bật nên mk phải tắt đi,thường nếu ko tắt thì sẽ có lỗi foriden 403
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
 
-        return httpSecurity.build();
+        return http.build();
     }
 
-    //override Bean Granted là giả dụ và giả dụ xong phải authen và nó bắt buộc phải có là admin thì mới được truy cập k cả có token hợp le
+    //override Bean Granted là giả dụ và giả dụ xong phải authen và nó bắt buộc phải có là admin thì mới được truy cập kể cả có token hợp le
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter(){
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+        converter.setAuthorityPrefix(""); //  KHÔNG thêm "ROLE_" nữa vì đã có sẵn trong token
+        converter.setAuthoritiesClaimName("scope"); // đọc quyền từ claim "scope"
 
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter=new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
+        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
+        return jwtConverter;
     }
 
-    @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter11111(){
-
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter=new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
-    }
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter111111(){
 
@@ -99,7 +92,6 @@ public class SecurityConfig {
 //                .macAlgorithm(MacAlgorithm.HS512)
 //                .build();
 //    }
-    //trong này thì có thể ném ra file khác dùng chung
     @Bean
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(10);

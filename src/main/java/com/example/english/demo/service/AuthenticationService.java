@@ -1,16 +1,16 @@
 package com.example.english.demo.service;
 
-import com.example.english.demo.dto.request.AuthenticationRequest;
 import com.example.english.demo.dto.request.IntrospectRequest;
+import com.example.english.demo.dto.request.LoginRequest;
 import com.example.english.demo.dto.request.LogoutRequest;
 import com.example.english.demo.dto.request.RefeshRequest;
 import com.example.english.demo.dto.response.AuthenticationResponse;
 import com.example.english.demo.dto.response.IntrospectResponse;
 import com.example.english.demo.entity.InvalidatedToken;
-import com.example.english.demo.exception.AppException;
-import com.example.english.demo.repository.InvalidatedTokenRepository;
 import com.example.english.demo.entity.User;
+import com.example.english.demo.exception.AppException;
 import com.example.english.demo.exception.ErrorCode;
+import com.example.english.demo.repository.InvalidatedTokenRepository;
 import com.example.english.demo.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -51,18 +51,20 @@ public class AuthenticationService {
     @Value("${refeshable-duration}")
     private long REFESHABLE_DURATION;
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse authenticate(LoginRequest request) {
         var user = userRepository.findByUsername(request.getUsername())
+                .filter(User::isActive)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXITSTED));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-        boolean authenticated1 = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
 
-        if (!authenticated1) {
+        if (!authenticated) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         var token =generateToken(user);
+        log.info("Generated JWT token: {}", token);
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
@@ -70,13 +72,13 @@ public class AuthenticationService {
     }
 
     //hàm này dùng bên trên
-    private String generateToken(User user) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+    public String generateToken(User user) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);//tạo header
 
         //tạo payload và claim là dữ liệu của mình
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
-                .issuer("cong.cong")
+                .subject(user.getUsername())// Người sở hữu token là username của User
+                .issuer("cong.cong")// Tên hệ thống phát hành token
                 .issueTime(new Date())  // Thời gian phát hành
                 .expirationTime(new Date(Instant.now().plus(VALID_DURRATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())// này để chúng ta get thêm claim id của token trên jwt.io
@@ -97,13 +99,13 @@ public class AuthenticationService {
             throw new RuntimeException(exception);
         }
     }
-//    hàm này cho vào scope
+//    hàm này cho vào scope  xây dựng một chuỗi quyền truy cập (scope) cho người dùng
     private String buildScope(User user){
         //dấu cách vì khi trả dữ liệu sẽ có các role cách nhau
         StringJoiner stringJoiner=new StringJoiner(" ");
         if(!CollectionUtils.isEmpty(user.getRoles()))
             user.getRoles().forEach(role -> {
-                stringJoiner.add("ROLE_"+role.getName());//cho ROLE_ vào đây làm prefix để pha biệt Role và Permission và khi lấy trên  jwwt ta có thể thấy ROLE_ đứng trước ADMIN
+                stringJoiner.add("ROLE_"+role.getName());//cho ROLE_ vào đây làm prefix để phan biệt Role và Permission và khi lấy trên  jwwt ta có thể thấy ROLE_ đứng trước ADMIN
                 if(!CollectionUtils.isEmpty(role.getPermissions())){
                     role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
                 }
@@ -113,18 +115,16 @@ public class AuthenticationService {
 
     //này dùng để verrify xem có phải đúng là token mk tạo ra hay không
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
-        var token=request.getToken();
+        var token = request.getToken();
+        boolean isValid = true;
+
         try {
-            verifyToken(token,false);
-        }catch (AppException exception){
-            return IntrospectResponse.builder()
-                    .valid(false)
-                    .build();
+            verifyToken(token, false);
+        } catch (AppException e) {
+            isValid = false;
         }
-        //
-        return IntrospectResponse.builder()
-                .valid(true)
-                .build();
+
+        return IntrospectResponse.builder().valid(isValid).build();
     }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {
@@ -138,7 +138,7 @@ public class AuthenticationService {
                     .id(jit)
                     .expiryTime(expiryTime)
                     .build();
-            invalidatedTokenRepository.save(invalidatedToken);
+            invalidatedTokenRepository.save(invalidatedToken);//lưu vào để xem user nào đã logout
         } catch (AppException exception) {
             log.info("Token already expiried");
         }
@@ -161,7 +161,7 @@ public class AuthenticationService {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        // ny để check xem token đã logout chưa ý mà
+        // nay để check xem token đã logout chưa ý mà vì khi logout có thể vẫn dùng đk token
         if(invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
@@ -194,5 +194,37 @@ public class AuthenticationService {
                 .authenticated(true)
                 .build();
     }
+
+    //hàm này để xác thực token gửi về email
+    public String generateConfirmationToken(User user) {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(user.getEmail()) // email sẽ là chủ thể của token
+                .issuer("english-app")
+                .issueTime(new Date())
+                .expirationTime(new Date(Instant.now().plus(15, ChronoUnit.MINUTES).toEpochMilli())) // token xác nhận email chỉ sống 15 phút
+                .jwtID(UUID.randomUUID().toString())
+                .claim("type", "EMAIL_CONFIRM")
+                .build();
+
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(header, payload);
+
+        try {
+            jwsObject.sign(new MACSigner(Signer_Key.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            throw new RuntimeException("Unable to sign confirmation token", e);
+        }
+    }
+
+    public boolean isAdmin(User user) {
+        if (user.getRoles() == null) return false;
+
+        return user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+    }
+
 
 }

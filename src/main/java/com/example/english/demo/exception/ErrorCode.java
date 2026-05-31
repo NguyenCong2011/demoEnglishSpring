@@ -18,7 +18,11 @@ public enum ErrorCode {
     TOEIC_EXAM_EXITSTED(155575,"Exxam existed",HttpStatus.BAD_REQUEST),
     TOEIC_EXAM_NOT_EXITSTED(1555875,"Exxam not existed",HttpStatus.BAD_REQUEST),
     FILE_UPLOAD_ERROR(1565435875,"file not = not existed",HttpStatus.BAD_REQUEST),
-    TOEIC_QUESTION_EXITSTED(1555775,"Question existed",HttpStatus.BAD_REQUEST);
+    TOEIC_QUESTION_EXITSTED(1555775,"Question existed",HttpStatus.BAD_REQUEST),
+    TOEIC_QUESTION_NOT_EXITSTED(1555775,"Question not existed",HttpStatus.BAD_REQUEST),
+    COMPETITION_NOT_FOUND(1555900, "Competition not found", HttpStatus.NOT_FOUND),
+    UPLOAD_FAILED(1213432343,"Faild upload",HttpStatus.BAD_REQUEST),
+    USER_NOT_IN_COMPETITION(1555901, "User is not part of this competition", HttpStatus.FORBIDDEN);
 
 
     private int code;

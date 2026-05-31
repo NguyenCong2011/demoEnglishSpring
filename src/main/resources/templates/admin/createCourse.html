@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Course</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        #thumbnail {
+            display: block;
+            margin-top: 20px;
+            max-width: 300px;
+            max-height: 300px;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>Create Course</h1>
+
+<div th:if="${error}" style="color: red;">
+    <p th:text="${error}"></p>
+</div>
+
+<form th:action="@{/admin/createCourse}" method="post">
+    <div>
+        <label for="courseName">Course Name:</label>
+        <input type="text" id="courseName" name="courseName" required />
+    </div>
+    <div>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+    </div>
+    <div>
+        <label for="price">Price:</label>
+        <input type="number" id="price" name="price" step="0.01" required />
+    </div>
+    <div>
+        <label for="duration">Duration(month):</label>
+        <input type="number" id="duration" name="duration" required />
+    </div>
+    <div>
+        <label for="isActive">Is Active:</label>
+        <input type="checkbox" id="isActive" name="isActive" value="true" />
+    </div>
+
+    <button type="submit">Create Course</button>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('#image').on('change', function (event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#thumbnail').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                $('#thumbnail').attr('src', '');
+            }
+        });
+    });
+</script>
+</body>
+</html>

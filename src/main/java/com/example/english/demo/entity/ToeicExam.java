@@ -19,15 +19,14 @@ public class ToeicExam{
     @Column(name = "exam_id")
     private Long examId;
     @Column(unique = true)
-    private String examName;
-    private int duration;
-    private int numOfParticipants;
-    private List<String> comments;
-    private int numOfSections;
-    private int numOfQuestions;
-    private String description;
     private String audio;
+    private Boolean isCloudinary = false;
+
 
     @OneToMany(mappedBy = "toeicExam")
     private List<ToeicQuestion> toeicQuestions;
+
+    @OneToMany(mappedBy = "toeicExam", cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
 }

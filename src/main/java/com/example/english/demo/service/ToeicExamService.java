@@ -4,8 +4,6 @@ import com.example.english.demo.dto.request.ToeicExamCreateRequest;
 import com.example.english.demo.dto.request.ToeicExamUpdateRequest;
 import com.example.english.demo.dto.response.ToeicExamResponse;
 import com.example.english.demo.entity.ToeicExam;
-import com.example.english.demo.exception.AppException;
-import com.example.english.demo.exception.ErrorCode;
 import com.example.english.demo.mapper.ToeicExamMapper;
 import com.example.english.demo.repository.ToeicExamRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +24,17 @@ public class ToeicExamService {
     private final ToeicExamMapper toeicExamMapper;
     private final ToeicExamRepository toeicExamRepository;
 
-    public ToeicExamResponse createToeicExam(ToeicExamCreateRequest toeicExamCreateRequest){
-        if(toeicExamRepository.existsByExamName(toeicExamCreateRequest.getExamName())){
-            throw new AppException(ErrorCode.TOEIC_EXAM_EXITSTED);
-        }
-        ToeicExam toeicExam=toeicExamMapper.toToeicExam(toeicExamCreateRequest);
 
-        toeicExam=toeicExamRepository.save(toeicExam);
+    public ToeicExamResponse createToeicExam(ToeicExamCreateRequest request) {
+        ToeicExam toeicExam = toeicExamMapper.toToeicExam(request);
+        toeicExam.setIsCloudinary(Boolean.TRUE.equals(request.getIsCloudinary()));
 
+        toeicExam = toeicExamRepository.save(toeicExam);
         return toeicExamMapper.toToeicExamResponse(toeicExam);
     }
 
     public ToeicExamResponse updateToeicExam(Long examId, ToeicExamUpdateRequest toeicExamUpdateRequest) {
-        log.info("in method update toeic exam  alllll");
+        log.info("in method update toeic exam ");
         ToeicExam toeicExam = toeicExamRepository.findById(examId).orElseThrow(() -> new RuntimeException("Exam not found"));
         toeicExamMapper.updateToeicExam(toeicExam, toeicExamUpdateRequest);
         ToeicExam updatedToeicExam=toeicExamRepository.save(toeicExam);

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
 
+@DiscriminatorColumn(name = "exam_type")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Entity
 @Data

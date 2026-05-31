@@ -52,85 +52,143 @@
             margin-bottom: 20px;
         }
 
-        /* Các phần link mặc định */
         .part-links a {
             text-decoration: none;
             padding: 10px;
-            background-color: #f1f1f1; /* Màu nền mặc định */
+            background-color: #f1f1f1;
             color: black;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s; /* Hiệu ứng chuyển màu mượt */
+            transition: background-color 0.3s;
         }
 
-        /* Màu nền khi di chuột vào các liên kết */
         .part-links a:hover {
             background-color: #007bff;
             color: white;
         }
 
-        /* Màu nền khi phần được chọn */
         .part-links a.active {
             background-color: #007bff;
             color: white;
         }
+
+        /* Thông báo lỗi */
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background-color: #ffe6e6;
+            border: 1px solid red;
+            padding: 10px;
+            border-radius: 5px;
+        }
     </style>
 
-    <!-- Thêm thư viện jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <div th:replace="~{header.html}"></div>
 
 <div class="content-container">
-    <!-- Hiển thị các liên kết cho từng phần -->
+
+    <!-- ✅ Thông báo lỗi khi import -->
+    <div th:if="${error}" class="error-message">
+        <p th:text="${error}"></p>
+    </div>
+
+    <!-- Các liên kết Part -->
     <div class="part-links">
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=1)}"
-           th:classappend="${part == 1} ? 'active' : ''"
-           id="part1">Part 1</a>
+           th:classappend="${part == 1} ? 'active' : ''" id="part1">Part 1</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=2)}"
-           th:classappend="${part == 2} ? 'active' : ''"
-           id="part2">Part 2</a>
+           th:classappend="${part == 2} ? 'active' : ''" id="part2">Part 2</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=3)}"
-           th:classappend="${part == 3} ? 'active' : ''"
-           id="part3">Part 3</a>
+           th:classappend="${part == 3} ? 'active' : ''" id="part3">Part 3</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=4)}"
-           th:classappend="${part == 4} ? 'active' : ''"
-           id="part4">Part 4</a>
+           th:classappend="${part == 4} ? 'active' : ''" id="part4">Part 4</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=5)}"
-           th:classappend="${part == 5} ? 'active' : ''"
-           id="part5">Part 5</a>
+           th:classappend="${part == 5} ? 'active' : ''" id="part5">Part 5</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=6)}"
-           th:classappend="${part == 6} ? 'active' : ''"
-           id="part6">Part 6</a>
+           th:classappend="${part == 6} ? 'active' : ''" id="part6">Part 6</a>
         <a th:href="@{/admin/show-toeic-question/{examId}(examId=${examId}, part=7)}"
-           th:classappend="${part == 7} ? 'active' : ''"
-           id="part7">Part 7</a>
+           th:classappend="${part == 7} ? 'active' : ''" id="part7">Part 7</a>
     </div>
 
     <h2>Questions for Part: <span th:text="${part}"></span></h2>
     <p><a th:href="@{/admin/create-toeic-question/{examId}(examId=${examId})}">Create Question</a></p>
+
+    <!-- Form import Excel -->
     <p>
-        <form th:action="@{/admin/import-toeic-questions/{examId}(examId=${examId})}" method="post" enctype="multipart/form-data">
-            <label for="file">Import Excel Questions:</label>
-            <input type="file" id="file" name="file" accept=".xlsx, .xls" required />
-            <button type="submit">Upload</button>
-        </form>
+    <form th:action="@{/admin/import-toeic-questions/{examId}(examId=${examId})}" method="post" enctype="multipart/form-data">
+        <label for="file">Import Excel Questions:</label>
+        <input type="file" id="file" name="file" accept=".xlsx, .xls" required />
+        <button type="submit">Upload</button>
+    </form>
     </p>
 
+    <!-- Nếu là link Cloudinary (bắt đầu bằng http) -->
+    <div th:if="${toeicExam.audio != null and toeicExam.audio.startsWith('http')}">
+        <audio controls th:attr="src=${toeicExam.audio}"></audio>
+        <p>Audio file: <span th:text="${toeicExam.audio}"></span></p>
+    </div>
+
+    <!-- Nếu là file nội bộ (không bắt đầu bằng http) -->
+    <div th:if="${toeicExam.audio != null and !toeicExam.audio.startsWith('http')}">
+        <audio controls>
+            <source th:src="@{'/audio/' + ${toeicExam.audio}}" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <p>Audio file: <span th:text="${toeicExam.audio}"></span></p>
+    </div>
 
 
+    <!-- Danh sách câu hỏi -->
     <div class="question-list">
         <div th:each="toeicQuestion : ${toeicQuestions}">
             <div class="question-item">
+                <!-- Form upload ảnh -->
+                <form th:action="@{/admin/update-question-image/{questionId}(questionId=${toeicQuestion.questionId})}"
+                      method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="examId" th:value="${examId}" />
+                    <input type="hidden" name="part" th:value="${part}" />
+
+                    <div>
+                        <label>Image:</label>
+                        <input type="file"
+                               th:id="'image_' + ${toeicQuestion.questionId}"
+                               name="imageFile"
+                               accept="image/*"
+                               th:attr="onchange='previewImage(event,' + ${toeicQuestion.questionId} + ')'" />
+                    </div>
+                    <div>
+                        <img th:id="'thumbnail_' + ${toeicQuestion.questionId}"
+                             th:if="${toeicQuestion.image != null and !toeicQuestion.image.isEmpty()}"
+                             th:src="@{${toeicQuestion.image}}"
+                             alt="Preview"
+                             style="max-width: 300px; margin-top: 10px;" />
+                        <img th:id="'thumbnail_' + ${toeicQuestion.questionId}"
+                             th:if="${toeicQuestion.image == null or toeicQuestion.image.isEmpty()}"
+                             alt="Preview"
+                             style="max-width: 300px; margin-top: 10px;" />
+                    </div>
+
+                    <!-- ✅ Checkbox chọn Cloudinary -->
+                    <div>
+                        <label for="isCloudinary">Upload to Cloudinary:</label>
+                        <input type="checkbox" id="isCloudinary" name="isCloudinary" value="true" />
+                    </div>
+
+                    <button type="submit">Save</button>
+                </form>
+
                 <p><strong>Question:</strong> <span th:text="${toeicQuestion.questionText}"></span></p>
                 <p><strong>Answer 1:</strong> <span th:text="${toeicQuestion.dapAn1}"></span></p>
                 <p><strong>Answer 2:</strong> <span th:text="${toeicQuestion.dapAn2}"></span></p>
                 <p><strong>Answer 3:</strong> <span th:text="${toeicQuestion.dapAn3}"></span></p>
                 <p><strong>Answer 4:</strong> <span th:text="${toeicQuestion.dapAn4}"></span></p>
                 <p><strong>Correct Answer:</strong> <span th:text="${toeicQuestion.correctAnswer}"></span></p>
-                <img th:src="@{${toeicQuestion.image}}" alt="Image" style="max-width: 300px;" />
             </div>
+        </div>
     </div>
 </div>
 
@@ -138,8 +196,28 @@
 
 <script>
     $(document).ready(function() {
+        // Có thể scroll tới lỗi nếu muốn
+        if ($(".error-message").length) {
+            $('html, body').animate({
+                scrollTop: $(".error-message").offset().top - 50
+            }, 600);
+        }
     });
+
+    function previewImage(event, id) {
+        const input = event.target;
+        const preview = document.getElementById('thumbnail_' + id);
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.src = '';
+        }
+    }
 </script>
-</div>
 </body>
 </html>
