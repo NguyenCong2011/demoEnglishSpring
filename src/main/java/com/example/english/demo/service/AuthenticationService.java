@@ -72,7 +72,7 @@ public class AuthenticationService {
     }
 
     //hàm này dùng bên trên
-    private String generateToken(User user) {
+    public String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);//tạo header
 
         //tạo payload và claim là dữ liệu của mình
