@@ -59,28 +59,6 @@ public class SecurityConfig {
         jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
         return jwtConverter;
     }
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter1() {
-        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
-        converter.setAuthorityPrefix(""); //  KHÔNG thêm "ROLE_" nữa vì đã có sẵn trong token
-        converter.setAuthoritiesClaimName("scope"); // đọc quyền từ claim "scope"
-
-        JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
-        jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
-        return jwtConverter;
-    }
-
-    @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter11111(){
-
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter=new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-
-        JwtAuthenticationConverter jwtAuthenticationConverter=new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        return jwtAuthenticationConverter;
-    }
-
 
     //bean này dùng cho bên trên
 //    @Bean
