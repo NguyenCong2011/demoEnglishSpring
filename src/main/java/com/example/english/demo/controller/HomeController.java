@@ -34,8 +34,10 @@ public class HomeController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody LoginRequest request,
-                                          HttpServletResponse response) {
+    public String authenticate(LoginRequest request,
+                            HttpServletResponse response,
+                            Model model) {
+
         var result = authenticationService.authenticate(request);
 
         if (result.isAuthenticated()) {
@@ -45,10 +47,11 @@ public class HomeController {
             cookie.setMaxAge(7 * 24 * 60 * 60);
             response.addCookie(cookie);
 
-            return ResponseEntity.ok().body(Map.of("message", "Login success"));
+            return "redirect:/";
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        model.addAttribute("error", "Invalid credentials");
+        return "login";
     }
 
 
