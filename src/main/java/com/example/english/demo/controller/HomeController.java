@@ -16,7 +16,6 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:4200")
 public class HomeController {
     private final AuthenticationService authenticationService;
@@ -27,6 +26,11 @@ public class HomeController {
     public String index(Model model) {
         model.addAttribute("name", "John");
         return "home";
+    }
+
+    @GetMapping("/login")
+    public String loginPage() {
+        return "login";
     }
 
     @PostMapping("/login")

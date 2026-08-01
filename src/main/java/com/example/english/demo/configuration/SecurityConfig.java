@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    String[] publicRoutes = {"payment-callback", "/payment/vnpay", "/course/detail/{id}", "/course/list", "/auth/refesh-token", "/ws/**", "/topic/**", "/app/invite", "/app/accept-invite", "/app/reject-invite", "/topic/invite/{userId}", "/user/search-users", "/user/toeic-detail/{examId}", "/competition", "/user/friends", "/user/submit-toeic-exam", "/user/show-toeic-question/{examId}", "/admin/login", "/user/toeic", "/audio/**", "/user/confirm-account/**", "/images/**", "/user/create", "/auth/login", "/api/login", "/toeic", "/online-tests", "/", "/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create", "/toeic-exam/update/{examId}"};
+    String[] publicRoutes = {"payment-callback", "/payment/vnpay", "/course/detail/{id}", "/course/list", "/auth/refesh-token", "/ws/**", "/topic/**", "/app/invite", "/app/accept-invite", "/app/reject-invite", "/topic/invite/{userId}", "/user/search-users", "/user/toeic-detail/{examId}", "/competition", "/user/friends", "/user/submit-toeic-exam", "/user/show-toeic-question/{examId}", "/admin/login", "/user/toeic", "/audio/**", "/user/confirm-account/**", "/images/**", "/user/create", "/auth/login", "/login", "/toeic", "/online-tests", "/", "/user", "/auth/verify-token", "/auth/login", "/auth/logout", "/auth/refesh-token", "/toeic-exam/create", "/toeic-exam/update/{examId}"};
     private CustomJwtDecoder customJwtDecoder;
 
     public SecurityConfig(CustomJwtDecoder customJwtDecoder) {

@@ -49,7 +49,7 @@ public class AdminController {
 
     private final CloudinaryService cloudinaryService;
 
-    @GetMapping("/login")
+    @GetMapping(" So I'm call/login")
     public String showAdminLoginPage() {
         return "admin/login";
     }
